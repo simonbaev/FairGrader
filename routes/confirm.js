@@ -19,18 +19,28 @@ router.get('/', function(req, res, next) {
 		if(contribution) {
 			if(contribution.expired) {
 				res.render('confirm',{
-					message: "Link expired."
+					message: "Link expired"
+				});
+			}
+			else if(contribution.confirmed) {
+				res.render('confirm',{
+					message: "Already confirmed"
 				});
 			}
 			else {
 				res.render('confirm',{
 					message: "Confirmed, thank you."
 				});
+				//-- Success
+				contribution.confirmed = true;
+				contribution.save(function(err, contribution){
+					console.log(JSON.stringify(contribution,null,3));
+				});
 			}
 		}
 		else {
 			res.render('confirm',{
-				message: "Not found."
+				message: "Not found"
 			});
 		}
 		return;

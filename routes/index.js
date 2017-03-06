@@ -54,6 +54,7 @@ router.post('/', function(req, res, next) {
 		//-- Send confirmation e-mail
 		var port = req.app.settings.port;
 		var host = req.protocol + '://' + req.hostname  + ':' + port;
+		console.log(JSON.stringify(contribution,null,3));
 		new EmailTemplate(path.join(__dirname,'..','templates','contributionReceived')).render(
 			{
 				contribution: {
