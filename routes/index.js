@@ -3,7 +3,15 @@ var express = require('express');
 var Assessment = require('../lib/models/assessment');
 var router = express.Router();
 
-/* GET home page. */
+router.post('/', function(req, res, next) {
+	console.log(JSON.stringify(req.body,null,3));
+	res.setHeader('Content-Type', 'application/json');
+	res.send({
+		status: 0,
+		message: 'OK'
+	});
+});
+
 router.get('/', function(req, res, next) {
 	Assessment.findOne({code:201702}).lean().exec(function(err, assessments){
 		if(err) {
@@ -13,6 +21,9 @@ router.get('/', function(req, res, next) {
 		for(let course of assessments.courses) {
 			let courseKey = course.subj + ' ' + course.numb + ' ' + course.title;
 			data[courseKey] = {
+				subj: course.subj,
+				numb: course.numb,
+				title: course.title,
 				projects: {},
 				students: []
 			};

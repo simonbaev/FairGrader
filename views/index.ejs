@@ -73,15 +73,18 @@
 				Playground
 			</legend>
 			<form action="" method="POST" class="form-horizontal">
+				<input type="hidden" name="course" value="<%=courseKey%>">
+				<input type="hidden" name="project" value="MT">
 				<div class="form-group">
 					<label for="my-name" class="col-xs-12 col-sm-2 control-label">My Name</label>
 					<div class="col-xs-12 col-sm-10">
+						<input type="hidden" name="my-email" id="my-email">
 						<select name="my-name" id="my-name" class="form-control">
 							<option value="--">--</option>
 							<%
 								for(let student of data[courseKey].students) {
 							%>
-							<option value="<%=student.name%>"><%=student.name%></option>
+							<option value="<%=student.name%>" data-value="<%=student.email%>"><%=student.name%></option>
 							<%
 								}
 							%>
@@ -89,7 +92,7 @@
 					</div>
 				</div>
 				<div class="form-group name-hidable name-hidden">
-					<label for="topic" class="col-xs-12 col-sm-2 control-label">Group/Topic</label>
+					<label for="topic" class="col-xs-12 col-sm-2 control-label">Group/Topic title</label>
 					<div class="col-xs-12 col-sm-10">
 						<select name="topic" id="topic" class="form-control" data-topics="<%=JSON.stringify(data[courseKey].projects.MT.topics)%>">
 							<option value="--">--</option>
@@ -105,9 +108,9 @@
 					</div>
 				</div>
 				<div class="form-group name-hidable topic-hidable topic-hidden">
-					<label for="overall" class="col-xs-12 col-sm-2 control-label">Group grade</label>
+					<label for="overall" class="col-xs-12 col-sm-2 control-label">Group/Topic grade</label>
 					<div class="col-xs-12 col-sm-10">
-						<input id="overall" class="form-control" data-slider-id='overall-slider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="100"/>
+						<input id="overall" class="form-control" data-slider-id='overall-slider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="100" name="overall"/>
 					</div>
 				</div>
 				<table class="table table-bordered name-hidable topic-hidable topic-hidden">
@@ -122,6 +125,8 @@
 					<tbody>
 					</tbody>
 				</table>
+				<!-- <div class="vgap"></div> -->
+				<button type="submit" class="btn btn-primary pull-right name-hidable topic-hidable topic-hidden">Submit</button>
 			</form>
 			<div class="vgap"></div>
 		</fieldset>

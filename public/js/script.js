@@ -18,9 +18,8 @@ $(document).ready(function () {
 		}
 		else {
 			$('form .name-hidable').removeClass('name-hidden');
-
+			$('#my-email').val(select.find('option:selected').attr('data-value'));
 		}
-
 	});
 	$('#topic').change(function(){
 		let select = $(this);
@@ -38,7 +37,28 @@ $(document).ready(function () {
 				$('table.table tbody')
 				.append(
 					$('<tr>')
-					.append($('<td>').text(student.name))
+					.append(
+						$('<td>')
+						.append(
+							$('<input>')
+							.attr({
+								'type': 'hidden',
+								'name': 'member-name',
+								'value': student.name
+							})
+						)
+						.append(
+							$('<input>')
+							.attr({
+								'type': 'hidden',
+								'name': 'member-email',
+								'value': student.email
+							})
+						)
+						.append(
+							$('<span>').text(student.name)
+						)
+					)
 					.append(
 						$('<td>')
 						.addClass('slider-container')
@@ -85,6 +105,7 @@ $(document).ready(function () {
 				$(this).parents('td').next().text(e.value);
 			})
 			.on('slideStop', function(e){
+				$(this).parents('td').next().text(e.value);
 				let progressScore = parseInt($(this).parents('tr').find('input[name=progress]').slider('getValue'));
 				let presentationScore = parseInt($(this).parents('tr').find('input[name=presentation]').slider('getValue'));
 				let overallGroupScore = parseInt($('#overall').slider('getValue'));
@@ -100,6 +121,14 @@ $(document).ready(function () {
 	$('#overall').slider();
 	$('#overall').on('slideStop',function(e){
 		overallScoreUpdateHandler(e.value);
+	});
+
+	$('form').submit(function(){
+		let data = $(this).serialize();
+		$.post('/', data, function(json){
+			console.log(JSON.stringify(json,null,3));
+		},'json');
+		return false;
 	});
 
 });
