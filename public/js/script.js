@@ -30,7 +30,6 @@ $(document).ready(function () {
 		else {
 			$('form .topic-hidable').removeClass('topic-hidden');
 			let topic = JSON.parse(select.attr('data-topics'))[option];
-			console.log(topic);
 			$('#overall').slider('setValue',100);
 			$('table.table tbody').empty();
 			for(let student of topic.students) {
@@ -126,7 +125,18 @@ $(document).ready(function () {
 	$('form').submit(function(){
 		let data = $(this).serialize();
 		$.post('/', data, function(json){
-			console.log(JSON.stringify(json,null,3));
+			if(json.status === 0) {
+				bootbox.alert({
+					title: 'Thank you',
+					message: 'Your contribution has been accepted. An e-mail with <b>confirmation</b> link will shortly be sent to your RADAR account. Please follow that link within time window of 24 hours to finalize your input.',
+					onEscape: true,
+					closeButton: false
+
+				});
+			}
+			else {
+				console.error(JSON.stringify(jsaon,null,3));
+			}
 		},'json');
 		return false;
 	});

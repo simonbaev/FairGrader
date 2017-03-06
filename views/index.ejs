@@ -75,11 +75,12 @@
 			<form action="" method="POST" class="form-horizontal">
 				<input type="hidden" name="course" value="<%=courseKey%>">
 				<input type="hidden" name="project" value="MT">
+				<input type="hidden" name="title" value=<%=data[courseKey].projects.MT.title%>>
 				<div class="form-group">
 					<label for="my-name" class="col-xs-12 col-sm-2 control-label">My Name</label>
 					<div class="col-xs-12 col-sm-10">
-						<input type="hidden" name="my-email" id="my-email">
-						<select name="my-name" id="my-name" class="form-control">
+						<input type="hidden" name="email" id="my-email">
+						<select name="name" id="my-name" class="form-control">
 							<option value="--">--</option>
 							<%
 								for(let student of data[courseKey].students) {
@@ -134,6 +135,7 @@
 	<script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
 	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 	<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/bootstrap-slider.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
 	<script src="/js/script.js"></script>
 </body>
 

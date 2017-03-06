@@ -12,7 +12,7 @@ var mongoose = require('mongoose');
 /**
  * Connect to MongoDB and return connection to set up event listeners
  */
-mongoose.Promise = require('bluebird');
+mongoose.Promise = global.Promise;
 mongoose.connect('mongodb://127.0.0.1/fg').connection
 .on('error', function(err) {
 	console.error('MongoDB:', err.message);
