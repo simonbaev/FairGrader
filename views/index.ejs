@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>FairGrader Application</title>
+	<link rel='stylesheet' href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/css/bootstrap-slider.min.css">
+	<link rel='stylesheet' href='/css/style.css' />
+</head>
+
+<body>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/">FairGrader @ GSW</a>
+			</div>
+		</div>
+	</nav>
+	<div class="vgap"></div>
+
+	<div class="title flex flex-h-center">
+		<%
+			var courseKey = Object.keys(data)[0];
+		%>
+		<h2>
+			<%=courseKey%>
+		</h2>
+		<h3>
+			<%=data[courseKey].projects.MT.title%>
+		</h3>
+	</div>
+	<div class="container">
+		<fieldset>
+			<legend>
+				Instructions
+			</legend>
+			<ol>
+				<li>
+					Select your own name
+				</li>
+				<li>
+					Select Group/Topic which is currently being presented
+				</li>
+				<li>
+					Evaluate individual performance of each member of the group by positioning the slider relative to other sliders.
+				</li>
+				<li>
+					Evaluate the overall group performance in the scale from 0 to 100%
+				</li>
+				<li>
+					Control individual grades of each group member if if necessary adjust corresponding sliders.
+				</li>
+				<li>
+					Submit your input for the group by clicking corresponding button. A confirmation e-mail will be sent to your RADAR account. You will need to <b>finalize</b> your submission by following the link from that e-mail. Only finalized contributions will be counted.
+				</li>
+				<li>
+					In case of multiple submissions for the same group my be the same student, the <b>latest</b> one will be counted.
+				</li>
+			</ol>
+		</fieldset>
+		<div class="vgap"></div>
+		<fieldset>
+			<legend>
+				Playground
+			</legend>
+			<form action="" method="POST" class="form-horizontal">
+				<div class="form-group">
+					<label for="my-name" class="col-xs-12 col-sm-2 control-label">My Name</label>
+					<div class="col-xs-12 col-sm-10">
+						<select name="my-name" id="my-name" class="form-control">
+							<option value="--">--</option>
+							<%
+								for(let student of data[courseKey].students) {
+							%>
+							<option value="<%=student.name%>"><%=student.name%></option>
+							<%
+								}
+							%>
+						</select>
+					</div>
+				</div>
+				<div class="form-group name-hidable name-hidden">
+					<label for="topic" class="col-xs-12 col-sm-2 control-label">Group/Topic</label>
+					<div class="col-xs-12 col-sm-10">
+						<select name="topic" id="topic" class="form-control" data-topics="<%=JSON.stringify(data[courseKey].projects.MT.topics)%>">
+							<option value="--">--</option>
+							<%
+								for(let topicKey of Object.keys(data[courseKey].projects.MT.topics)) {
+									let topic = data[courseKey].projects.MT.topics[topicKey]
+							%>
+							<option value="<%=topicKey%>"><%=topic.title%></option>
+							<%
+								}
+							%>
+						</select>
+					</div>
+				</div>
+				<div class="form-group name-hidable topic-hidable topic-hidden">
+					<label for="overall" class="col-xs-12 col-sm-2 control-label">Group grade</label>
+					<div class="col-xs-12 col-sm-10">
+						<input id="overall" class="form-control" data-slider-id='overall-slider' type="text" data-slider-min="0" data-slider-max="100" data-slider-step="1" data-slider-value="100"/>
+					</div>
+				</div>
+				<table class="table table-bordered name-hidable topic-hidable topic-hidden">
+					<thead>
+						<tr>
+							<th>Student name</th>
+							<th colspan="2">Progress (50%)</th>
+							<th colspan="2">Presentation (50%)</th>
+							<th>Total</th>
+						</tr>
+					</thead>
+					<tbody>
+					</tbody>
+				</table>
+			</form>
+			<div class="vgap"></div>
+		</fieldset>
+	</div>
+	<script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/bootstrap-slider.min.js"></script>
+	<script src="/js/script.js"></script>
+</body>
+
+</html>

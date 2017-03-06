@@ -1,0 +1,50 @@
+body,
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+a {
+  color: #00B7FF;
+}
+.vgap {
+	height: 51px;
+}
+.flex {
+	display: flex;
+}
+.flex-h-center {
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+.title h2,
+.title h3 {
+	margin: 0;
+	padding: 10px;
+}
+#overall-slider {
+	width: 100% !important;
+	margin-top: 7px;
+}
+
+.table tbody tr td:nth-of-type(2n) {
+	width: 25%;
+}
+.table tbody tr td:nth-of-type(2n+1) {
+	width: 10%;
+}
+.table tbody tr td:first-child {
+	width: 20%;
+}
+.table tbody tr td:last-child {
+	width: 10%;
+}
+.table .slider {
+	width: 90% !important;
+	margin: 0 10px;
+}
+.name-hidden, .topic-hidden {
+	display: none;
+}
