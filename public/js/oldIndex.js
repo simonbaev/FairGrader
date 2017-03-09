@@ -124,7 +124,7 @@ $(document).ready(function () {
 
 	$('form').submit(function(){
 		let data = $(this).serialize();
-		$.post('/', data, function(json){
+		$.post('/old', data, function(json){
 			if(json.status === 0) {
 				bootbox.alert({
 					title: 'Thank you',

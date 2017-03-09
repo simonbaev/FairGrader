@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>FairGrader Application</title>
+	<link rel='stylesheet' href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel='stylesheet' href='/css/eval.css'/>
+	<%
+	if(typeof kind === 'string' && kind === 'projectPage') {
+		%>
+		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/css/bootstrap-slider.min.css">
+		<link rel='stylesheet' href='/css/projectPage.css'/>
+		<%
+	}
+	%>
+</head>
+
+<body>
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="/">FairGrader @ GSW</a>
+			</div>
+		</div>
+	</nav>
+	<div class="vgap"></div>
+	<%
+	if(typeof type === 'string') {
+		if(type === 'error' && typeof message === 'string') {
+			%>
+			<meta http-equiv="refresh" content="5;URL='/'" />
+			<div class="alert alert-danger alert-dismissible fade in" role="alert">
+				<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+				<p><%=message%></p>
+			</div>
+			<%
+		}
+		else if(type === 'data' && typeof kind === 'string'){
+			%>
+			<div class="container">
+			<%
+			switch(kind) {
+				case 'listOfTerms': {
+					%>
+					<h3>Please select the term</h3>
+					<ul>
+						<%
+						for(let term of data) {
+							let year = term.slice(0,4);
+							let semester = {'02': 'Spring', '05': 'Summer', '08': 'Fall'}[term.slice(4)];
+							%>
+							<li><a href="<%=urlPrefix%>/<%=term%>"><%=semester%> <%=year%></a></li>
+							<%
+						}
+						%>
+					</ul>
+					<%
+					break;
+				}
+				case 'listOfCourses': {
+					%>
+					<h3>Please select the course</h3>
+					<ul>
+					<%
+					for(let course of data) {
+						%>
+						<li><a href="<%=urlPrefix%>/<%=course.code%>"><%=course.title%></a></li>
+						<%
+					}
+					%>
+					</ul>
+					<%
+					break;
+				}
+				case 'listOfProjects': {
+					%>
+					<h3>Please select the project</h3>
+					<ul>
+					<%
+					for(let project of data) {
+						%>
+						<li><a href="<%=urlPrefix%>/<%=project.key%>"><%=project.title%></a></li>
+						<%
+					}
+					%>
+					</ul>
+					<%
+					break;
+				}
+				case 'projectPage': {
+					%>
+					<%include projectPage%>
+					<%
+				}
+			}
+			%>
+			</div>
+			<%
+		}
+	}
+	%>
+	<script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<%
+	if(typeof kind === 'string' && kind === 'projectPage') {
+		%>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/bootstrap-slider.min.js"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+		<script src="/js/projectPage.js"></script>
+		<%
+	}
+	%>
+</body>
+
+</html>

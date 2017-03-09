@@ -2,6 +2,7 @@ var express = require('express');
 var basicAuth = require('basic-auth');
 var assessmentData = require('../lib/data/assessment');
 var contributionData = require('../lib/data/contribution');
+var projectData = require('../lib/data/project');
 var router = express.Router();
 
 var auth = function(req, res, next) {
@@ -36,6 +37,10 @@ router.get('/', auth, function(req, res, next) {
 			{
 				fn: contributionData.setup,
 				description: 'Initialization of contribution data...'
+			},
+			{
+				fn: projectData.setup,
+				description: 'Initialization of project data...'
 			},
 		]
 		.forEach(function(entry,index,array){

@@ -5,8 +5,10 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var mongoose = require('mongoose');
-var index = require('./routes/index');
+var evaluation = require('./routes/eval');
+var oldIndex = require('./routes/oldIndex');
 var init = require('./routes/init');
+var index = require('./routes/index');
 var confirm = require('./routes/confirm');
 var app = express();
 
@@ -37,8 +39,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/init', init);
+app.use('/eval', evaluation);
 app.use('/confirm', confirm);
+app.use('/init', init);
+app.use('/old', oldIndex);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
