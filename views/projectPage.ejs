@@ -1,1 +1,56 @@
-<pre><%=data%></pre>
+<div class="vgap"></div>
+<div class="title flex flex-h-center">
+	<%
+	let courseParts = data.course.code.split(/_/);
+	let courseTitle = '';
+	if(courseParts.length === 2) {
+		courseTitle = courseParts[0].toUpperCase() + ' ' + courseParts[1] + ' ' + data.course.title;
+	}
+	else {
+		courseTitle = data.course.code.toUpperCase() + ' ' + data.course.title;
+	}
+	let year = data.term.slice(0,4);
+	let semester = {'02': 'Spring', '05': 'Summer', '08': 'Fall'}[data.term.slice(4)];
+	let termTitle = semester + ' ' + year;
+	%>
+	<h1 class="H">
+		<%=termTitle%>
+	</h1>
+	<h2 class="H">
+		<%=courseTitle%>
+	</h2>
+	<h3 class="H">
+		<%=data.project.title%>
+	</h3>
+</div>
+<%
+if(data.project.classification === 'presentation') {
+	%>
+	<fieldset>
+		<legend>
+			Instructions
+		</legend>
+		<ol>
+			<li>
+				Select your <b>own name</b>;
+			</li>
+			<li>
+				Select the <b>topic</b> which is currently being presented;
+			</li>
+			<li>
+				Evaluate <b>individual performance</b> of each member of the group by positioning criterium related  sliders;
+			</li>
+			<li>
+				Evaluate the <b>overall group performance</b> in the scale from 0 to 100%;
+			</li>
+			<li>
+				Control individual grades of each group member and if necessary adjust corresponding sliders;
+			</li>
+			<li>
+				<b>Submit your evaluation</b> by clicking corresponding button. A confirmation e-mail will be sent to your RADAR account. You will need to <b>finalize</b> your submission by following the link from that e-mail. Only finalized evaluations will be counted.
+			</li>
+		</ol>
+	</fieldset>
+<%
+}
+%>
