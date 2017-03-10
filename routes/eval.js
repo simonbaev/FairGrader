@@ -43,7 +43,7 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 	}
 	else {
 		console.log('DEBUG: ', 'Term parameter is OK', req.params.term);
-		if(!req.params.course || !/^[a-z]+[_]?\d+$/i.test(req.params.course)) {
+		if(!req.params.course || !/^[a-zA-Z]{2,5}_\d{2,5}$/i.test(req.params.course)) {
 			console.log('DEBUG: ', 'Course parameter is not provided or incorrect', req.params.course);
 			Project
 			.find({

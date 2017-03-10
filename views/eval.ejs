@@ -46,13 +46,13 @@
 		}
 		else if(type === 'data' && typeof kind === 'string'){
 			%>
-			<div class="container">
+			<div class="container-fluid">
 			<%
 			switch(kind) {
 				case 'listOfTerms': {
 					%>
-					<h3>Please select the term</h3>
-					<ul>
+					<h2>Please select the term</h2>
+					<ul class="list-unstyled">
 						<%
 						for(let term of data) {
 							let year = term.slice(0,4);
@@ -67,24 +67,48 @@
 					break;
 				}
 				case 'listOfCourses': {
-					%>
-					<h3>Please select the course</h3>
-					<ul>
-					<%
+					let courses = {};
 					for(let course of data) {
-						%>
-						<li><a href="<%=urlPrefix%>/<%=course.code%>"><%=course.title%></a></li>
-						<%
+						if(!courses[course.dept]) {
+							courses[course.dept] = [];
+						}
+						courses[course.dept].push(course);
 					}
 					%>
-					</ul>
+					<h2>Please select the course</h2>
 					<%
+					for(let dept of Object.keys(courses)) {
+						%>
+						<fieldset>
+							<legend>
+								Department of <%=dept%>
+							</legend>
+							<ul class="list-unstyled">
+							<%
+							for(let course of courses[dept]) {
+								let courseParts = course.code.split(/_/);
+								let courseTitle = '';
+								if(courseParts.length === 2) {
+									courseTitle = courseParts[0].toUpperCase() + ' ' + courseParts[1] + ' ' + course.title;
+								}
+								else {
+									courseTitle = course.code.toUpperCase() + ' ' + course.title;
+								}
+								%>
+								<li><a href="<%=urlPrefix%>/<%=course.code%>"><%=courseTitle%></a></li>
+								<%
+							}
+							%>
+							</ul>
+						</fieldset>
+						<%
+					}
 					break;
 				}
 				case 'listOfProjects': {
 					%>
-					<h3>Please select the project</h3>
-					<ul>
+					<h2>Please select the project</h2>
+					<ul class="list-unstyled">
 					<%
 					for(let project of data) {
 						%>

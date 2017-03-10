@@ -8,3 +8,9 @@ html {
 .vgap {
 	height: 51px;
 }
+.list-unstyled li {
+	margin-left: 25px;
+}
+fieldset {
+	margin-left: 30px;
+}
