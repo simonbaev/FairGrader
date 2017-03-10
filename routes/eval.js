@@ -27,7 +27,7 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 				res.redirect(req.baseUrl + '/' + projectData[0].term + '/' + projectData[0].course.code + '/' + projectData[0].project.key);
 			}
 			else {
-				res.render('eval', {
+				let dataForRender = {
 					type: 'data',
 					kind: 'listOfTerms',
 					urlPrefix: req.baseUrl,
@@ -37,7 +37,13 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 					.filter(function(elem,idx,arr){
 						return arr.indexOf(elem) >= idx;
 					})
-				});
+				};
+				if(dataForRender.data.length === 1) {
+					res.redirect(dataForRender.urlPrefix + '/' + dataForRender.data[0]);
+				}
+				else {
+					res.render('eval', dataForRender);
+				}
 			}
 		});
 	}
@@ -66,7 +72,7 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 					res.redirect(req.baseUrl + '/' + projectData[0].term + '/' + projectData[0].course.code + '/' + projectData[0].project.key);
 				}
 				else {
-					res.render('eval', {
+					let dataForRender = {
 						type: 'data',
 						kind: 'listOfCourses',
 						urlPrefix: req.baseUrl + req.path,
@@ -79,7 +85,13 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 							})
 							.indexOf(elem.code) >= idx;
 						})
-					});
+					};
+					if(dataForRender.data.length === 1) {
+						res.redirect(dataForRender.urlPrefix + '/' + dataForRender.data[0].code);
+					}
+					else {
+						res.render('eval', dataForRender);
+					}
 				}
 			});
 		}
