@@ -1,8 +1,11 @@
+/* jshint esnext: true */
+
 var express = require('express');
 var basicAuth = require('basic-auth');
 var assessmentData = require('../lib/data/assessment');
 var contributionData = require('../lib/data/contribution');
 var projectData = require('../lib/data/project');
+var userData = require('../lib/data/user');
 var router = express.Router();
 
 var auth = function(req, res, next) {
@@ -25,6 +28,7 @@ var auth = function(req, res, next) {
 };
 
 router.get('/', auth, function(req, res, next) {
+	let report = [];
 	req.session.destroy(function(err) {
 		if (err) {
 			return next(err);
@@ -42,15 +46,23 @@ router.get('/', auth, function(req, res, next) {
 				fn: projectData.setup,
 				description: 'Initialization of project data...'
 			},
+			{
+				fn: userData.setup,
+				description: 'Initialization of user data...'
+			}
 		]
 		.forEach(function(entry,index,array){
 			entry.fn.call(null, function(err, data){
 				if(err) {
 					return next(err);
 				}
-				console.log(entry.description,"Created " + data.length + " object(s)");
+				report.push(entry.description + "Created " + data.length + " object(s)");
+				console.log(entry.description, "Created " + data.length + " object(s)");
 				if(index == (array.length-1)) {
-					res.render('init');
+					res.render('init', {
+						report: report,
+						session: req.session,
+					});
 				}
 			});
 		});

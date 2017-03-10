@@ -2,12 +2,29 @@
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
-	<meta http-equiv="refresh" content="3;URL='/'" />
+	<meta http-equiv="refresh" content="10;URL='/'" />
+	<link rel='stylesheet' href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel='stylesheet' href='/css/init.css'/>
 	<title>Application initialization</title>
 </head>
 <body>
-	<p>
-		Initialization completed. You will be automatically redirected to the landing page.
-	</p>
+	<%include navbar%>
+	<div class="container-fluid">
+		<h3>
+			Initialization completed.
+		</h3>
+		<ul class="list-unstyled">
+		<%
+		for(let reportItem of report) {
+			%>
+			<li><%=reportItem%></li>
+			<%
+		}
+		%>
+		</ul>
+		<p>
+			You will be automatically redirected to the <a href="/">landing page</a>.
+		</p>
+	</div>
 </body>
 </html>

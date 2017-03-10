@@ -143,7 +143,10 @@ router.get('/', function(req, res, next) {
 				data[courseKey].students.push(temp);
 			}
 		}
-  		res.render('oldIndex', {data: data});
+  		res.render('oldIndex', {
+  			data: data,
+  			session: req.session,
+  		});
 	});
 });
 

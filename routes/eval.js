@@ -3,9 +3,14 @@ const express = require('express');
 const path = require('path');
 const router = express.Router();
 const Project = require('../lib/models/project');
+const User = require('../lib/models/user');
 
 router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], function(req, res, next) {
-	if(!req.params.term || !/^\d{6}$/.test(req.params.term)) {
+	if(!req.session.uid) {
+		req.session.next = req.baseUrl + req.path;
+		return res.redirect('/login');
+	}
+	if(!req.params.term || !/^20[12]\d0[257]$/.test(req.params.term)) {
 		console.log('DEBUG: ', 'Term parameter is not provided or incorrect', req.params.term);
 		Project
 		.find({
@@ -19,7 +24,8 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 			if(!projectData || !projectData.length) {
 				res.render('eval', {
 					type: 'error',
-					message: 'Active items not found'
+					message: 'Active items not found',
+					session: req.session
 				});
 				return;
 			}
@@ -31,6 +37,7 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 					type: 'data',
 					kind: 'listOfTerms',
 					urlPrefix: req.baseUrl,
+					session: req.session,
 					data: projectData.map(function(item){
 						return item.term;
 					})
@@ -64,7 +71,8 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 				if(!projectData || !projectData.length) {
 					res.render('eval', {
 						type: 'error',
-						message: 'Term not found'
+						message: 'Term not found',
+						session: req.session,
 					});
 					return;
 				}
@@ -76,6 +84,7 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 						type: 'data',
 						kind: 'listOfCourses',
 						urlPrefix: req.baseUrl + req.path,
+						session: req.session,
 						data: projectData.map(function(item){
 							return item.course;
 						})
@@ -113,7 +122,8 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 					if(!projectData || !projectData.length) {
 						res.render('eval', {
 							type: 'error',
-							message: 'Course not found'
+							message: 'Course not found',
+							session: req.session,
 						});
 						return;
 					}
@@ -125,6 +135,7 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 							type: 'data',
 							kind: 'listOfProjects',
 							urlPrefix: req.baseUrl + req.path,
+							session: req.session,
 							data: projectData.map(function(item){
 								return item.project;
 							})
@@ -154,13 +165,15 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 					if(!projectData) {
 						res.render('eval', {
 							type: 'error',
-							message: 'Project not found'
+							message: 'Project not found',
+							session: req.session,
 						});
 						return;
 					}
 					res.render('eval', {
 						type: 'data',
 						kind: 'projectPage',
+						session: req.session,
 						data: projectData
 					});
 				});

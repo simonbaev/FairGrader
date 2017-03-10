@@ -1,0 +1,94 @@
+body,
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+.vgap {
+	height: 51px;
+}
+.flex-column {
+	display: flex;
+	flex-direction: column;
+}
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+.flex-h-center {
+	display: flex;
+	justify-content: center;
+}
+.flex-v-center {
+	display: flex;
+	align-items: center;
+}
+.flex-center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.login-signup {
+	width: 50vw;
+	min-width: 300px;
+	max-width: 500px;
+}
+.login-signup > .mypanel {
+	margin: 10px 0;
+}
+.login-signup > .message-panel {
+	padding: 5px;
+}
+.login-signup > .message-panel p {
+	margin: 0;
+}
+.login-signup > .form-panel {
+	width: 100%;
+}
+.login-signup > .form-panel .form-group > input:focus:required:invalid {
+	border-color: #ff7777;
+	box-shadow: 0 0 5px red;
+}
+.login-signup > .form-panel .button-container {
+	padding: 25px 0;
+}
+.login-signup > .form-panel .button-container > button {
+	width: 50%;
+}
+.login-signup > .separator-panel {
+	width: 100%;
+	margin: 0;
+}
+.login-signup > .separator-panel .hr {
+	text-align: center;
+	margin: 0;
+}
+.login-signup > .separator-panel .hr:before,
+.login-signup > .separator-panel .hr:after {
+	content: "";
+	display: inline-block;
+	height: 1px;
+	position: relative;
+	vertical-align: middle;
+	width: 50%;
+}
+.login-signup > .separator-panel .hr:before {
+	right: 0.5em;
+	margin-left: -50%;
+	background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0,0,0, 0.75));
+}
+.login-signup > .separator-panel .hr:after {
+	left: 0.5em;
+	margin-right: -50%;
+	background-image: linear-gradient(to right, rgba(0,0,0, 0.75), rgba(0, 0, 0, 0));
+}
+
+.login-signup > .link-panel {
+	width: 100%;
+	margin: 10px auto;
+}
+.login-signup > .link-panel button:hover {
+	text-decoration: none;
+}
+

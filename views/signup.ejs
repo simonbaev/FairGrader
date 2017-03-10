@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>FairGrader @ GSW</title>
+	<link rel='stylesheet' href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel='stylesheet' href='/css/login-signup.css'/>
+</head>
+
+<body>
+	<%include navbar%>
+	<div class="container-fluid flex-row flex-h-center">
+
+		<div class="login-signup flex-column flex-center">
+			<div class="mypanel message-panel flex-row flex-h-center">
+				<p class="text-center">&nbsp;<span></span></p>
+			</div>
+			<div class="mypanel header-panel">
+				<h4>Please Sign Up</h4>
+			</div>
+			<div class="mypanel form-panel ">
+				<form action="" method="POST">
+					<div class="form-group">
+						<label for="email">E-Mail</label>
+						<input type="email" name="email" class="form-control" placeholder="Official GSW e-mail address" required>
+					</div>
+					<div class="form-group">
+						<label for="password">Password</label>
+						<input type="password" id="password" name="password" class="form-control" pattern=".{8,}" placeholder="Passwords must match" required>
+					</div>
+					<div class="form-group">
+						<label for="password-confirm">Confirm Password</label>
+						<input type="password" id="password-confirm" name="password-confirm" class="form-control" placeholder="Passwords must match" required>
+					</div>
+					<div class="button-container flex-row flex-h-center">
+						<button type="submit" class="btn btn-primary">Create Account</button>
+					</div>
+				</form>
+			</div>
+			<div class="mypanel separator-panel">
+				<p class="hr">
+					or
+				</p>
+			</div>
+			<div class="mypanel link-panel flex-row flex-h-center">
+				<button type="button" class="btn btn-link">Log In</button>
+			</div>
+		</div>
+	</div>
+	<script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+	<script src="/js/common.js"></script>
+	<script src="/js/signup.js"></script>
+</body>
+</html>

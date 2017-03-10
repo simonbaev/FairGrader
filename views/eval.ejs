@@ -38,7 +38,10 @@
 			switch(kind) {
 				case 'listOfTerms': {
 					%>
-					<h2>Please select the term</h2>
+					<div class="flex-row flex-h-center">
+						<h2>Please select the term</h2>
+					</div>
+					<div class="vgap"></div>
 					<ul class="list-unstyled">
 						<%
 						for(let term of data) {
@@ -62,7 +65,10 @@
 						courses[course.dept].push(course);
 					}
 					%>
-					<h2>Please select the course</h2>
+					<div class="flex-row flex-h-center">
+						<h2>Please select the course</h2>
+					</div>
+					<div class="vgap"></div>
 					<%
 					for(let dept of Object.keys(courses)) {
 						%>
@@ -94,7 +100,10 @@
 				}
 				case 'listOfProjects': {
 					%>
-					<h2>Please select the project</h2>
+					<div class="flex-row flex-h-center">
+						<h2>Please select the project</h2>
+					</div>
+					<div class="vgap"></div>
 					<ul class="list-unstyled">
 					<%
 					for(let project of data) {

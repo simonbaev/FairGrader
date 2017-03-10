@@ -9,6 +9,9 @@ var evaluation = require('./routes/eval');
 var oldIndex = require('./routes/oldIndex');
 var init = require('./routes/init');
 var index = require('./routes/index');
+var login = require('./routes/login');
+var signup = require('./routes/signup');
+var logout = require('./routes/logout');
 var confirm = require('./routes/confirm');
 var app = express();
 
@@ -22,9 +25,9 @@ app.use(logger('dev'));
 app.use(session({
 	resave: true,
 	saveUninitialized: true,
-	secret: 'Sky is Blue',
+	secret: 'Get Away From Her You Bitch',
 	cookie: {
-		maxAge: 20 * 60 * 1000
+		maxAge: 75 * 60 * 1000
 	},
 	store: new(require('express-sessions'))({
 		storage: 'mongodb',
@@ -40,7 +43,10 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
 app.use('/eval', evaluation);
+app.use('/login', login);
 app.use('/confirm', confirm);
+app.use('/logout', logout);
+app.use('/signup', signup);
 app.use('/init', init);
 app.use('/old', oldIndex);
 
