@@ -13,26 +13,31 @@
 			<ul class="nav navbar-nav navbar-right">
 				<%
 				if(session && session.uid) {
+					let nameParts = session.name.split(/\s/);
+					let name = '';
+					if(nameParts[0].slice(-1) === ",") {
+						name = nameParts[1] + ' ' + nameParts[0].slice(0,-1);
+					}
+					else {
+						name = nameParts.slice(0,2).join(" ");
+					}
 					%>
 					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Profile<span class="caret"></span></a>
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><%=name%></a>
 						<ul class="dropdown-menu">
-							<!--
-							<li><p><%=session.name%></p></li>
-							<li role="separator" class="divider"></li>
-							 -->
+							<li><a href="/account">Profile</a></li>
 							<li><a href="/reports">Reports</a></li>
-							<li><a href="/account">Account</a></li>
+							<li role="separator" class="divider"></li>
+							<li><a href="/logout">Logout</a></li>
 						</ul>
 					</li>
-					<li><a href="/logout">Logout</a></li>
-				<%
+					<%
 				}
 				else {
 					%>
 					<li><a href="/login">Login</a></li>
 					<li><a href="/signup">Sign Up</a></li>
-				<%
+					<%
 				}
 				%>
 			</ul>

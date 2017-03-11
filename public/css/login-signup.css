@@ -91,4 +91,7 @@ html {
 .login-signup > .link-panel button:hover {
 	text-decoration: none;
 }
+.login-signup #restore {
+	padding: 0;
+}
 
