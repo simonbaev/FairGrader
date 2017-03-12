@@ -1,0 +1,74 @@
+body,
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+.vgap {
+	height: 51px;
+}
+.flex-column {
+	display: flex;
+	flex-direction: column;
+}
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+.flex-h-center {
+	display: flex;
+	justify-content: center;
+}
+.flex-v-center {
+	display: flex;
+	align-items: center;
+}
+.flex-center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+/*
+	Error message block
+*/
+.restore-error {
+	width: 75vw;
+	height: 50vh;
+	min-width: 300px;
+	max-width: 500px;
+}
+.restore-error > .mypanel {
+	margin: 10px 0;
+	padding: 20px;
+}
+/*
+	Password input and submission form
+*/
+.restore-form {
+	width: 50vw;
+	height: 75vh;
+	min-width: 300px;
+	max-width: 500px;
+}
+.restore-form > .mypanel {
+	margin: 10px 0;
+}
+.restore-form > .header-panel {
+	padding: 25px;
+}
+.restore-form > .form-panel {
+	width: 100%;
+}
+.restore-form > .form-panel .form-group > input:focus:required:invalid {
+	border-color: #ff7777;
+	box-shadow: 0 0 5px red;
+}
+.restore-form > .form-panel .button-container {
+	padding: 25px 0;
+}
+.restore-form > .form-panel .button-container > button {
+	width: 50%;
+}
+
+

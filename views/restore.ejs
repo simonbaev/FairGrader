@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>FairGrader @ GSW</title>
+	<link rel='stylesheet' href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+	<link rel='stylesheet' href='/css/restore.css'/>
+</head>
+<body>
+	<%include navbar%>
+	<div class="container-fluid flex-row flex-h-center">
+		<%
+		if(status !== 0 && typeof message === 'string' && message) {
+			%>
+			<div class="restore-error flex-column flex-center">
+				<meta http-equiv="refresh" content="10;URL='/'" />
+				<div class="mypanel header-panel">
+					<h3 class="text-danger">
+						Error
+					</h3>
+					<h3><small><%=message%></small></h3>
+				</div>
+			</div>
+			<%
+		}
+		else if(status === 0 && token){
+			%>
+			<div class="restore-form flex-column flex-center">
+				<div class="mypanel header-panel">
+					<h4>Please type in your new password</h4>
+				</div>
+				<div class="mypanel form-panel ">
+					<form action="/restore/data" method="POST" autocomplete="off">
+						<input type="hidden" name="token" value="<%=token%>">
+						<div class="form-group">
+							<label for="password">Password</label>
+							<input type="password" id="password" name="password" class="form-control" pattern=".{8,}" placeholder="Passwords must match" required>
+						</div>
+						<div class="form-group">
+							<label for="password-confirm">Confirm Password</label>
+							<input type="password" id="password-confirm" name="password-confirm" class="form-control" placeholder="Passwords must match" required>
+						</div>
+						<div class="button-container flex-row flex-h-center">
+							<button type="submit" class="btn btn-primary">Submit</button>
+						</div>
+					</form>
+				</div>
+			</div>
+			<%
+		}
+		%>
+	</div>
+	<script src="//code.jquery.com/jquery-3.1.1.min.js"></script>
+	<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js"></script>
+	<script src="/js/restore.js"></script>
+</body>
+</html>

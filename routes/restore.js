@@ -5,7 +5,32 @@ const router = express.Router();
 const User = require('../lib/models/user');
 const Token = require('../lib/models/tokens');
 
-router.post('/', function (req, res, next) {
+router.get('/', function (req, res, next) {
+	Token.findOne({uuid: req.query.id}).lean().exec(function(err, token){
+		if(err) {
+			return next(err);
+		}
+		if(!token) {
+			return res.render('restore', {
+				status: 1,
+				message: 'Security token is incorrect or has been expired, please repeat password recovery process',
+				session: req.session
+			});
+		}
+		res.render('restore', {
+			status: 0,
+			token: token._id,
+			session: req.session
+		});
+	});
+});
+
+router.post('/data', function (req, res, next) {
+	console.log(req.body);
+	res.redirect('/login');
+});
+
+router.post('/request', function (req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	User.find({
 		email: req.body.email
@@ -32,7 +57,10 @@ router.post('/', function (req, res, next) {
 		}
 		//-- Send e-mail
 		new Token({
-			target: 'passwordRestore'
+			target: {
+				type: 'passwordRestore',
+				id: users[0]._id
+			}
 		})
 		.save(function(err, token){
 			if(err) {
