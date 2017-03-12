@@ -91,7 +91,17 @@ html {
 .login-signup > .link-panel button:hover {
 	text-decoration: none;
 }
-.login-signup #restore {
+.login-signup #restore,
+.login-signup #restore:focus,
+.login-signup #restore:hover {
 	padding: 0;
+	text-decoration: none;
+	border: none;
+	outline: none;
+	color: #337ab7;
 }
+.login-signup #restore:disabled {
+	color: #777;
+}
+
 

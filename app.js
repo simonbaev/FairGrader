@@ -10,10 +10,12 @@ var oldIndex = require('./routes/oldIndex');
 var init = require('./routes/init');
 var index = require('./routes/index');
 var login = require('./routes/login');
+var restore = require('./routes/restore');
 var signup = require('./routes/signup');
 var logout = require('./routes/logout');
 var confirm = require('./routes/confirm');
 var app = express();
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -47,6 +49,7 @@ app.use('/login', login);
 app.use('/confirm', confirm);
 app.use('/logout', logout);
 app.use('/signup', signup);
+app.use('/restore', restore);
 app.use('/init', init);
 app.use('/old', oldIndex);
 
