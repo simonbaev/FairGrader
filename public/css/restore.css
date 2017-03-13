@@ -35,8 +35,8 @@ html {
 .restore-error {
 	width: 75vw;
 	height: 50vh;
-	min-width: 300px;
-	max-width: 500px;
+	min-width: 400px;
+	max-width: 600px;
 }
 .restore-error > .mypanel {
 	margin: 10px 0;
@@ -53,6 +53,12 @@ html {
 }
 .restore-form > .mypanel {
 	margin: 10px 0;
+}
+.restore-form > .message-panel {
+	padding: 5px;
+}
+.restore-form > .message-panel p {
+	margin: 0;
 }
 .restore-form > .header-panel {
 	padding: 25px;

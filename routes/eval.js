@@ -96,9 +96,11 @@ router.get(['/', '/:term', '/:term/:course', '/:term/:course/:project'], functio
 						})
 					};
 					if(dataForRender.data.length === 1) {
+						console.log('1');
 						res.redirect(dataForRender.urlPrefix + '/' + dataForRender.data[0].code);
 					}
 					else {
+						console.log(JSON.stringify(dataForRender,null,3));
 						res.render('eval', dataForRender);
 					}
 				}

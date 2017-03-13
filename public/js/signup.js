@@ -1,3 +1,5 @@
+/* jshint esnext: true */
+
 var formSubmitHandler = function(ev, doSubmit){
 	if(doSubmit) {
 		return true;
@@ -17,6 +19,16 @@ $('.form-panel form').submit(formSubmitHandler);
 $('.link-panel button').click(function(){
 	window.location.replace('/login');
 });
+
+$('.form-panel form input[name=email]').keyup(function(){
+	let errorMessage = '';
+	if(this.validity.valueMissing || this.validity.typeMismatch || !/[@](radar[.])?gsw[.]edu$/.test(this.value)) {
+		errorMessage = 'Not an official GSW e-mail';
+	}
+	this.setCustomValidity(errorMessage);
+	this.title = errorMessage;
+});
+
 $('.form-panel form input[type=password]').keyup(function(){
 	var errorMessage;
 	if(this.id === "password") {

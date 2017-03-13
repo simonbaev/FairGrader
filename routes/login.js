@@ -46,7 +46,7 @@ router.post('/', function (req, res, next) {
 			let nextHop = req.session.next || '/';
 			req.session.faculty = user.faculty;
 			req.session.uid = user._id;
-			req.session.name = user.name;
+			req.session.name = user.name || (user.faculty ? 'Faculty' : 'Student');
 			res.redirect(nextHop);
 		}
 	});

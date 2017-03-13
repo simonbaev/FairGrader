@@ -22,17 +22,9 @@ router.post('/', function (req, res, next) {
 				});
 			}
 			else {
-				if(/[@](radar[.])?gsw[.]edu$/.test(req.body.email)) {
-					res.send({
-						status: 0
-					});
-				}
-				else {
-					res.send({
-						status: 2,
-						message: 'Official GSW E-mail address must be used for registration'
-					});
-				}
+				res.send({
+					status: 0
+				});
 			}
 		});
 	}
@@ -47,8 +39,6 @@ router.post('/', function (req, res, next) {
 				if(err) {
 					return next(err);
 				}
-				req.session.uid = user._id;
-				req.session.name = user.name;
 				res.redirect(req.session.next || '/');
 			});
 		}

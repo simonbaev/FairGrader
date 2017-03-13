@@ -21,18 +21,17 @@ $('.link-panel button').click(function(){
 });
 
 $('.form-panel input[name=email]').keyup(function(){
+	let errorMessage = '';
 	if(this.validity.valueMissing || this.validity.typeMismatch || !/[@](radar[.])?gsw[.]edu$/.test(this.value)) {
-		$('#restore')
-		.attr({
-			'title': 'Make sure to type in correct official GSW e-mail',
-			'disabled': ''
-		});
+		$('#restore').attr('disabled', '');
+		errorMessage = 'Not an official GSW e-mail';
 	}
 	else {
-		$('#restore')
-		.attr('title','')
-		.removeAttr('disabled');
+		$('#restore').removeAttr('disabled');
 	}
+	$('#restore').attr('title',errorMessage);
+	this.setCustomValidity(errorMessage);
+	this.title = errorMessage;
 })
 .trigger('keyup');
 
