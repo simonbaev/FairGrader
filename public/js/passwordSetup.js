@@ -2,7 +2,10 @@
 
 $('.form-panel form').submit(function(){
 	let form = $(this);
-	$.post(form.attr('action'), form.serialize(), function(json){
+	$.post(
+		form.attr('action'),
+		form.serialize(),
+		function(json){
 			if(json.status !== 0) {
 				showMessage($('.message-panel span'),'text-danger', json.message);
 			}

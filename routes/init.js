@@ -6,6 +6,7 @@ var assessmentData = require('../lib/data/assessment');
 var contributionData = require('../lib/data/contribution');
 var projectData = require('../lib/data/project');
 var userData = require('../lib/data/user');
+var tokenData = require('../lib/data/token');
 var router = express.Router();
 
 var auth = function(req, res, next) {
@@ -41,6 +42,10 @@ router.get('/', auth, function(req, res, next) {
 			{
 				fn: contributionData.setup,
 				description: 'Initialization of contribution data...'
+			},
+			{
+				fn: tokenData.setup,
+				description: 'Initialization of token data...'
 			},
 			{
 				fn: projectData.setup,

@@ -35,3 +35,13 @@ fieldset {
 	align-items: center;
 	justify-content: center;
 }
+.eval-error {
+	width: 75vw;
+	height: 50vh;
+	min-width: 400px;
+	max-width: 600px;
+}
+.eval-error > .mypanel {
+	margin: 10px 0;
+	padding: 20px;
+}

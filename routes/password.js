@@ -8,27 +8,7 @@ const EmailTemplate = require('email-templates').EmailTemplate;
 const mailer = require('../lib/mailer');
 const path = require('path');
 
-router.get('/', function (req, res, next) {
-	Token.findOne({uuid: req.query.id}).lean().exec(function(err, token){
-		if(err) {
-			return next(err);
-		}
-		if(!token || token.used) {
-			return res.render('restore', {
-				status: 1,
-				message: 'Security token is incorrect, has been used or has been expired, please repeat password recovery process',
-				session: req.session
-			});
-		}
-		res.render('restore', {
-			status: 0,
-			token: token._id,
-			session: req.session
-		});
-	});
-});
-
-router.post('/data', function (req, res, next) {
+router.post('/update', function (req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	Token.findById(req.body.token, function(err, token) {
 		if(err) {
@@ -43,44 +23,49 @@ router.post('/data', function (req, res, next) {
 				message: 'Security token is incorrect or has been expired, please repeat password recovery process'
 			});
 		}
-		if(token.target.type === 'passwordRestore') {
-			User.findById(token.target.id, function(err, user){
+		User.findById(token.target.id, function(err, user){
+			if(err) {
+				return res.send({
+					status: 3,
+					message: 'User retrieval error: ' + err.message
+				});
+			}
+			if(!user) {
+				return res.send({
+					status: 4,
+					message: 'User account referred in the token is invalid'
+				});
+			}
+			if(req.body.password !== req.body['password-confirm']){
+				console.log(JSON.stringify(req.body,null,3));
+				return res.send({
+					status: 5,
+					message: 'Passwords in both fields must match'
+				});
+			}
+			user.pass = req.body.password;
+			user.save(function(err, user){
 				if(err) {
 					return res.send({
-						status: 3,
-						message: 'User retrieval error: ' + err.message
+						status: 6,
+						message: 'User account update error: ' + err.message
 					});
 				}
-				if(!user) {
-					return res.send({
-						status: 4,
-						message: 'User account referred in the token is invalid'
-					});
-				}
-				user.pass = req.body.password;
-				user.save(function(err, user){
+				token.used = true;
+				token.save(function(err){
 					if(err) {
 						return res.send({
-							status: 5,
-							message: 'User account update error: ' + err.message
+							status: 7,
+							message: 'Security token cannot be updated: ' + err.message
 						});
 					}
-					token.used = true;
-					token.save(function(err){
-						if(err) {
-							return res.send({
-								status: 6,
-								message: 'Security token cannot be updated: ' + err.message
-							});
-						}
-						res.send({
-							status: 0,
-							message: 'Your password has been successfully updated. You will be redirected to login page momentarily.'
-						});
+					res.send({
+						status: 0,
+						message: 'Your password has been successfully updated.'
 					});
 				});
 			});
-		}
+		});
 	});
 });
 
@@ -112,7 +97,7 @@ router.post('/request', function (req, res, next) {
 		//-- Send e-mail
 		new Token({
 			target: {
-				type: 'passwordRestore',
+				view: 'passwordSetup',
 				id: users[0]._id
 			}
 		})

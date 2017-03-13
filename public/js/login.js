@@ -37,12 +37,13 @@ $('.form-panel input[name=email]').keyup(function(){
 
 $('#restore').click(function(){
 	let email = $('.form-panel input[name=email]').val().trim();
+	let postURL = this.dataset.url;
 	bootbox.confirm({
 		title: 'Please confirm...',
 		message: 'An e-mail with password recovery link will be sent to <b>' + email + '</b> email address. Would you like to proceed?',
 		callback: function(result){
 			if(result) {
-				$.post('/restore/request',
+				$.post(postURL,
 					{
 						email: email
 					},
