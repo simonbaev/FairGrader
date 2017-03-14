@@ -1,0 +1,49 @@
+body,
+html {
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+}
+.vgap {
+	height: 51px;
+}
+.flex-column {
+	display: flex;
+	flex-direction: column;
+}
+.flex-row {
+	display: flex;
+	flex-direction: row;
+}
+.flex-h-center {
+	display: flex;
+	justify-content: center;
+}
+.flex-v-center {
+	display: flex;
+	align-items: center;
+}
+.flex-center {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+/*
+	Error message block
+*/
+.reports-error {
+	width: 75vw;
+	height: 50vh;
+	min-width: 400px;
+	max-width: 600px;
+}
+.reports-error > .mypanel {
+	margin: 10px 0;
+	padding: 20px;
+}
+/*
+	Body
+*/
+.reports-body {
+}

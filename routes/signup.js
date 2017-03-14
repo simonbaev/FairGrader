@@ -36,10 +36,12 @@ router.post('/', function (req, res, next) {
 				message: 'This is not an official GSW e-mail'
 			});
 		}
+		let isFaculty = /[@]gsw[.]edu$/.test(req.body.email);
 		new User({
 			email: req.body.email,
 			pass: uuid.v4(),
-			faculty: /[@]gsw[.]edu$/.test(req.body.email)
+			name: isFaculty ? 'Faculty' : 'Student',
+			faculty: isFaculty
 		})
 		.save(function(err, user){
 			if(err) {
@@ -66,7 +68,7 @@ router.post('/', function (req, res, next) {
 				new EmailTemplate(path.join(__dirname,'..','templates','accountConfirmation')).render(
 					{
 						token: token.uuid,
-						name: user.faculty ? 'Faculty' : 'Student',
+						name: user.name || 'User',
 						host: host,
 					},
 					function(err,result){

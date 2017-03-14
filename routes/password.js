@@ -113,7 +113,7 @@ router.post('/request', function (req, res, next) {
 			new EmailTemplate(path.join(__dirname,'..','templates','passwordRestore')).render(
 				{
 					token: token.uuid,
-					name: users[0].name.split(/\s/)[1],
+					name: users[0].name,
 					host: host,
 				},
 				function(err,result){
