@@ -29,11 +29,11 @@
 	}
 	else if(status === 0 && data) {
 		%>
-		<div class="container-fluid flex-row flex-h-center">
-			<div class="reports-body flex-column flex-center">
-				<div class="ct-chart ct-perfect-fourth"></div>
-				<pre><%=JSON.stringify(data,null,3)%></pre>
-			</div>
+		<div class="hidden" id="chart" data-chart="<%=JSON.stringify(data)%>"></div>
+		<div class="container-fluid reports-body">
+			<ol class="breadcrumb">
+			</ol>
+			<div class="ct-chart ct-my"></div>
 		</div>
 		<%
 	}
