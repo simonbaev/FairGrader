@@ -13,6 +13,7 @@ function courseToString(course) {
 $(document).ready(function() {
 	let chartData = JSON.parse(document.querySelector('#chart').dataset.chart);
 	console.log(chartData);
+	/*
 	let term = '201702';
 	let course = 'CSCI_4940';
 	let project = 'MT';
@@ -92,4 +93,5 @@ $(document).ready(function() {
 			.text('No report data found')
 		);
 	}
+	*/
 });

@@ -3,7 +3,13 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../lib/models/user');
-const Contribution = require('../lib/models/contribution');
+const Report = require('../lib/models/report');
+
+function termCodeToString(termCode) {
+	let year = termCode.slice(0,4);
+	let semester = {'02':'Spring', '05':'Summer', '08':'Fall'}[termCode.slice(4)];
+	return semester + ' ' + year;
+}
 
 router.get('/', function (req, res, next) {
 	if(!req.session.uid) {
@@ -19,7 +25,11 @@ router.get('/', function (req, res, next) {
 			});
 		}
 		let data = {};
-		Contribution.find().lean().exec(function(err,contributions){
+		Report.find(
+			user.faculty ? {facultyEmail: user.email} : { email: user.email }
+		)
+		.lean()
+		.exec(function(err,reports){
 			if(err) {
 				return res.render('reports', {
 					status: 2,
@@ -27,62 +37,26 @@ router.get('/', function (req, res, next) {
 					session: req.session
 				});
 			}
-			for(let contribution of contributions) {
-				if(!data[contribution.term]) {
-					data[contribution.term] = {};
-				}
-				let term = data[contribution.term];
-				if(!term[contribution.course]) {
-					term[contribution.course] = {};
-				}
-				let course = term[contribution.course];
-				if(!course[contribution.project]) {
-					course[contribution.project] = {
-						title: contribution.title,
-						students: {}
-					};
-				}
-				let project = course[contribution.project];
-				for(let student of contribution.members){
-					if(user.faculty || user.email === student.email) {
-						if(!project.students[student.email]) {
-							project.students[student.email] = {
-								name: student.name || 'Student',
-								topic: contribution.topic,
-								scores: {
-									labels: [],
-									criteria: {
-										presentation: [],
-										progress: [],
-										overall: [],
-										calculated: []
-									}
-								}
-							};
-						}
-						let scores = project.students[student.email].scores;
-						scores.labels.push(user.faculty ? contribution.email : null);
-						scores.criteria.presentation.push(student.presentation);
-						scores.criteria.progress.push(student.progress);
-						scores.criteria.overall.push(contribution.overall);
-						scores.criteria.calculated.push(contribution.overall / 100 * (student.progress * 0.5 + student.presentation * 0.5));
-					}
-				}
-			}
-			for(let term in data) {
-				for(let course in data[term]) {
-					for(let project in data[term][course]) {
-						if(!Object.keys(data[term][course][project].students).length) {
-							delete data[term][course][project];
-						}
-					}
-					if(!Object.keys(data[term][course]).length) {
-						delete data[term][course];
-					}
-				}
-				if(!Object.keys(data[term]).length) {
-					delete data[term];
-				}
+			data = {};
+			for(let report of reports) {
+				let term = data[report.term] = data[report.term] || {
+					title: termCodeToString(report.term)
+				};
+				let course = term[report.course.key] = term[report.course.key] || {
+					title: report.course.title
+				};
+				let project = course[report.project.key] = course[report.project.key] || {
+					title: report.project.title,
+					students: {}
+				};
+				let student = project.students[report.email] = project.students[report.email] || {
+					topic: {
+						key: report.topic.key,
+						title: report.topic.title
+					},
+					contributions: {}
+				};
+				student.contributions[report.contributor.email] = report.contributor.score;
 			}
 			res.render('reports', {
 				status: 0,
