@@ -1,13 +1,14 @@
 /* jshint esnext: true */
 
-var express = require('express');
-var basicAuth = require('basic-auth');
-var assessmentData = require('../lib/data/assessment');
-var contributionData = require('../lib/data/contribution');
-var projectData = require('../lib/data/project');
-var userData = require('../lib/data/user');
-var tokenData = require('../lib/data/token');
-var router = express.Router();
+const express = require('express');
+const basicAuth = require('basic-auth');
+const assessmentData = require('../lib/data/assessment');
+const reportData = require('../lib/data/report');
+const projectData = require('../lib/data/project');
+const userData = require('../lib/data/user');
+const tokenData = require('../lib/data/token');
+const router = express.Router();
+const series = require("async/series");
 
 var auth = function(req, res, next) {
 	function unauthorized(res, showDialog) {
@@ -34,43 +35,20 @@ router.get('/', auth, function(req, res, next) {
 		if (err) {
 			return next(err);
 		}
-		[
-			{
-				fn: assessmentData.setup,
-				description: 'Initialization of assessment data...'
-			},
-			{
-				fn: contributionData.setup,
-				description: 'Initialization of contribution data...'
-			},
-			{
-				fn: tokenData.setup,
-				description: 'Initialization of token data...'
-			},
-			{
-				fn: projectData.setup,
-				description: 'Initialization of project data...'
-			},
-			{
-				fn: userData.setup,
-				description: 'Initialization of user data...'
+		series([
+				projectData.setup,
+				reportData.setup,
+				tokenData.setup,
+				userData.setup
+			],
+			function(err, results) {
+				console.log(JSON.stringify(results,null,3));
+				res.render('init', {
+					report: results.join('; '),
+					session: req.session,
+				});
 			}
-		]
-		.forEach(function(entry,index,array){
-			entry.fn.call(null, function(err, data){
-				if(err) {
-					return next(err);
-				}
-				report.push(entry.description + "Created " + data.length + " object(s)");
-				console.log(entry.description, "Created " + data.length + " object(s)");
-				if(index == (array.length-1)) {
-					res.render('init', {
-						report: report,
-						session: req.session,
-					});
-				}
-			});
-		});
+		);
 	});
 });
 

@@ -12,16 +12,10 @@
 	<div class="container-fluid">
 		<h3>
 			Initialization completed.
+			<small>
+				<%=report%>
+			</small>
 		</h3>
-		<ul class="list-unstyled">
-		<%
-		for(let reportItem of report) {
-			%>
-			<li><%=reportItem%></li>
-			<%
-		}
-		%>
-		</ul>
 		<p>
 			You will be automatically redirected to the <a href="/">landing page</a>.
 		</p>

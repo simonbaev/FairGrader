@@ -8,7 +8,6 @@ const bodyParser = require('body-parser');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const evaluation = require('./routes/eval');
-const oldIndex = require('./routes/oldIndex');
 const init = require('./routes/init');
 const index = require('./routes/index');
 const login = require('./routes/login');
@@ -17,7 +16,6 @@ const email = require('./routes/emailLink');
 const reports = require('./routes/reports');
 const signup = require('./routes/signup');
 const logout = require('./routes/logout');
-const confirm = require('./routes/confirm');
 const app = express();
 
 // view engine setup
@@ -51,12 +49,10 @@ app.use('/eval', evaluation);
 app.use('/email', email);
 app.use('/login', login);
 app.use('/reports', reports);
-app.use('/confirm', confirm);
 app.use('/logout', logout);
 app.use('/signup', signup);
 app.use('/password', password);
 app.use('/init', init);
-app.use('/old', oldIndex);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
