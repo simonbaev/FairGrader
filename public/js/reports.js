@@ -1,28 +1,92 @@
 /* jshint esnext: true */
 
-function termCodeToString(termCode) {
-	let year = termCode.slice(0,4);
-	let semester = {'02':'Spring', '05':'Summer', '08':'Fall'}[termCode.slice(4)];
-	return semester + ' ' + year;
-}
-function courseToString(course) {
-	return course.split(/_/).join(' ');
-}
+let socket = io('/reports');
+socket
+.on('connect',function(){
+	console.log('Data socket successfully connected to', JSON.stringify(socket.id,null,3));
+})
+.on('data', function(data){
+	console.log(data);
+	//-- Depending on the number of terms in data we display either a a list of terms or jump to "the only one"
+	if(Object.keys(data).length === 1) {
+		$('.breadcrumb')
+		.append(
+			$('<li>')
+			.addClass('bc-reports')
+			.append(
+				$('<a>')
+				.attr({
+					'href': '/reports',
+				})
+				.text('Reports')
+			)
+		);
+		termClickHandler.call(data[Object.keys(data)[0]]);
+	}
+	else {
+		$('.breadcrumb')
+		.append(
+			$('<li>')
+			.addClass('active')
+			.text('Reports')
+		);
+		$('.selector')
+		.empty()
+		.append($('<fieldset>').append($('<legend>').text('Please select the term')))
+		.append($('<ul>').addClass('list-unstyled'));
+		for(let term in data) {
+			$('.selector ul')
+			.append(
+				$('<li>')
+				.append(
+					$('<a>')
+					.text(data[term].title)
+					.attr({
+						'href': '#',
+						'data-term': term
+					})
+					.click(termClickHandler.bind(data[term]))
+				)
+			);
+		}
+	}
+});
 
+function termClickHandler() {
+	let data = this;
+	let subData = data.courses;
+	let subDataKeys = Object.keys(subData);
+	console.log(data);
+	if(subDataKeys.length === 1) {
+		if($('.bc-term').length) {
+			$('.bc-reports').nextAll().remove();
+		}
+		$('.breadcrumb')
+		.append(
+			$('<li>')
+			.addClass('bc-term')
+			.append(
+				$('<a>')
+				.attr({
+					'href': '#',
+				})
+				.click(courseClickHandler.bind(data))
+				.text(data.title)
+			)
+		);
+		courseClickHandler(subData[subDataKeys[0]].projects);
+	}
+	else {
+
+	}
+}
+function courseClickHandler() {
+	let data = this;
+	console.log(data);
+}
 
 $(document).ready(function() {
-	let chartData = JSON.parse(document.querySelector('#chart').dataset.chart);
-	console.log(chartData);
 	/*
-	let term = '201702';
-	let course = 'CSCI_4940';
-	let project = 'MT';
-	if(chartData &&
-		chartData[term] &&
-		chartData[term][course] &&
-		chartData[term][course][project] &&
-		chartData[term][course][project].students) {
-		let displayData = chartData[term][course][project].students;
 		//-- Breadcrumb
 		$('.breadcrumb')
 		.append($('<li>').append($('<a>').attr({'href':'#'}).text('Reports')))

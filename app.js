@@ -1,12 +1,15 @@
 /* jshint esnext: true */
-
+//-- Modules
 const express = require('express');
 const path = require('path');
 const favicon = require('serve-favicon');
 const logger = require('morgan');
 const bodyParser = require('body-parser');
-const session = require('express-session');
+const expressSession = require('express-session');
+const sharedSession = require('express-socket.io-session');
+const socketio = require('socket.io');
 const mongoose = require('mongoose');
+//-- Routes
 const evaluation = require('./routes/eval');
 const init = require('./routes/init');
 const index = require('./routes/index');
@@ -16,16 +19,10 @@ const email = require('./routes/emailLink');
 const reports = require('./routes/reports');
 const signup = require('./routes/signup');
 const logout = require('./routes/logout');
+//-- Express initialization
+const io = new socketio();
 const app = express();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-
-// uncomment after placing your favicon in /public
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
-app.use(session({
+const session = expressSession({
 	resave: true,
 	saveUninitialized: true,
 	secret: 'Get Away From Her You Bitch',
@@ -39,7 +36,15 @@ app.use(session({
 		collection: 'sessions',
 		expire: 86400
 	})
-}));
+});
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+app.set('socketio', io);
+// uncomment after placing your favicon in /public
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('dev'));
+app.use(session);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -48,7 +53,7 @@ app.use('/', index);
 app.use('/eval', evaluation);
 app.use('/email', email);
 app.use('/login', login);
-app.use('/reports', reports);
+app.use('/reports', reports(io.of('/reports').use(sharedSession(session))));
 app.use('/logout', logout);
 app.use('/signup', signup);
 app.use('/password', password);
@@ -71,6 +76,5 @@ app.use(function(err, req, res, next) {
 	res.status(err.status || 500);
 	res.render('error');
 });
-
 
 module.exports = app;

@@ -9,6 +9,7 @@ var debug = require('debug')('fairgrader:server');
 var http = require('http');
 var mongoose = require('mongoose');
 
+
 /**
  * Connect to MongoDB and return connection to set up event listeners
  */
@@ -22,6 +23,7 @@ mongoose.connect('mongodb://127.0.0.1/fg').connection
 	var port = normalizePort(process.env.PORT || '4000');
 	app.set('port', port);
 	var server = http.createServer(app);
+	app.get('socketio').listen(server);
 	server.listen(port);
 	server.on('error', onServerError);
 	server.on('listening', function(){

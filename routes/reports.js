@@ -25,46 +25,58 @@ router.get('/', function (req, res, next) {
 			});
 		}
 		let data = {};
-		Report.find(
-			user.faculty ? {facultyEmail: user.email} : { email: user.email }
-		)
+		Report.find(user.faculty ? {facultyEmail: user.email} : { email: user.email })
 		.lean()
 		.exec(function(err,reports){
 			if(err) {
 				return res.render('reports', {
 					status: 2,
-					message: 'Cannot retrieve contribution data',
+					message: 'Cannot retrieve report data',
 					session: req.session
 				});
 			}
-			data = {};
-			for(let report of reports) {
-				let term = data[report.term] = data[report.term] || {
-					title: termCodeToString(report.term)
-				};
-				let course = term[report.course.key] = term[report.course.key] || {
-					title: report.course.title
-				};
-				let project = course[report.project.key] = course[report.project.key] || {
-					title: report.project.title,
-					students: {}
-				};
-				let student = project.students[report.email] = project.students[report.email] || {
-					topic: {
-						key: report.topic.key,
-						title: report.topic.title
-					},
-					contributions: {}
-				};
-				student.contributions[report.contributor.email] = report.contributor.score;
-			}
 			res.render('reports', {
 				status: 0,
-				data: data,
 				session: req.session
 			});
 		});
 	});
 });
 
-module.exports = router;
+module.exports = function(io) {
+	io
+	.on('connect', function(socket){
+		User.findById(socket.handshake.session.uid, function(err, user){
+			let data = {};
+			Report.find(user.faculty ? {facultyEmail: user.email} : { email: user.email })
+			.lean()
+			.exec(function(err,reports){
+				data = {};
+				for(let report of reports) {
+					let term = data[report.term] = data[report.term] || {
+						title: termCodeToString(report.term),
+						courses: {}
+					};
+					let course = term.courses[report.course.key] = term.courses[report.course.key] || {
+						title: report.course.title,
+						projects: {}
+					};
+					let project = course.projects[report.project.key] = course.projects[report.project.key] || {
+						title: report.project.title,
+						students: {}
+					};
+					let student = project.students[report.email] = project.students[report.email] || {
+						topic: {
+							key: report.topic.key,
+							title: report.topic.title
+						},
+						contributions: {}
+					};
+					student.contributions[report.contributor.email] = report.contributor.score;
+				}
+				socket.emit('data', data);
+			});
+		});
+	});
+	return router;
+};
