@@ -72,7 +72,10 @@ module.exports = function(io) {
 						},
 						contributions: {}
 					};
-					student.contributions[report.contributor.email] = report.contributor.score;
+					student.contributions[report.contributor.email] = {
+						score: report.contributor.score,
+						comment: report.contributor.comment
+					};
 				}
 				socket.emit('data', data);
 			});

@@ -10,6 +10,10 @@ socket
 	//-- Set term select
 	let termData = data;
 	let termKeys = Object.keys(data);
+	if(!termKeys.length) {
+		$('#report-details').empty().append($('<h4>').addClass('text-warning').text('No report data found'));
+		return false;
+	}
 	let termSelect = $('#select-term').empty();
 	for(let term of termKeys) {
 		termSelect
@@ -76,12 +80,28 @@ socket
 						.addClass('ct-chart ct-my')
 					)
 					.append(
-						$('<dl>')
-						.addClass('dl-horizontal')
-						.append($('<dt>').text('Average:'))
-						.append($('<dd>').attr('id','stat-average'))
-						.append($('<dt>').text('Standard deviation:'))
-						.append($('<dd>').attr('id','stat-deviation'))
+						$('<table>')
+						.addClass('table table-bordered')
+						.append(
+							$('<thead>')
+							.append(
+								$('<tr>')
+								.append($('<th>').text('Average'))
+								.append($('<th>').text('Standard deviation'))
+								.append($('<th>').text('Minimum'))
+								.append($('<th>').text('Maximum'))
+							)
+						)
+						.append(
+							$('<tbody>')
+							.append(
+								$('<tr>')
+								.append($('<td>').attr('id','stat-average'))
+								.append($('<td>').attr('id','stat-deviation'))
+								.append($('<td>').attr('id','stat-min'))
+								.append($('<td>').attr('id','stat-max'))
+							)
+						)
 					);
 					//-- Prepare and fill chart data
 					let chartData = displayData[displayKeys[0]].contributions;
@@ -90,7 +110,7 @@ socket
 						return 'S' + (index+1);
 					});
 					let chartSeries = chartKeys.map(function(entry,index,array){
-						return chartData[entry];
+						return chartData[entry].score;
 					});
 					//-- Calculate and display statistics
 					let average = chartSeries.reduce(function(acc,value){
@@ -104,6 +124,8 @@ socket
 					}, 0) / chartSeries.length);
 					$('#stat-average').text(average.toFixed(2));
 					$('#stat-deviation').text(deviation.toFixed(2));
+					$('#stat-min').text(Math.min.apply(null,chartSeries).toFixed(2));
+					$('#stat-max').text(Math.max.apply(null,chartSeries).toFixed(2));
 					//-- Populate chart with series data
 					$('.ct-chart').empty();
 					new Chartist.Bar(
