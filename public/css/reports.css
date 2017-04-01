@@ -63,6 +63,14 @@ html {
    max-width: 850px;
 }
 
+fieldset {
+	margin-top: 30px;
+}
+
+.fieldset-content {
+	margin-left: 50px;
+}
+
 .ct-label {
    font-size: 1em;
 }

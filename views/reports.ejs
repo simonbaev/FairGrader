@@ -29,11 +29,41 @@
 	}
 	else if(status === 0) {
 		%>
-		<div class="container-fluid reports-body">
-			<ol class="breadcrumb">
-			</ol>
-			<div class="selector"></div>
-			<div class="ct-chart ct-my"></div>
+		<div class="container-fluid">
+			<fieldset>
+				<legend>
+					Project Selector
+				</legend>
+				<div class="fieldset-content">
+					<div class="row">
+						<div class="form-group col-sm-2 col-xs-6">
+							<label>Term</label>
+							<select id="select-term" class="form-control">
+								<option value="--">--</option>
+							</select>
+						</div>
+						<div class="form-group col-sm-4 col-xs-6">
+							<label>Course</label>
+							<select id="select-course" class="form-control">
+								<option value="--">--</option>
+							</select>
+						</div>
+						<div class="form-group col-sm-6 col-xs-12">
+							<label>Project</label>
+							<select id="select-project" class="form-control">
+								<option value="--">--</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</fieldset>
+			<fieldset>
+				<legend>
+					Report details
+				</legend>
+				<div id="report-details" class="fieldset-content">
+				</div>
+			</fieldset>
 		</div>
 		<%
 	}
