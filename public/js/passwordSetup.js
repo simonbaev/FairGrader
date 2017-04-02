@@ -36,3 +36,15 @@ $('.form-panel form input[type=password]').keyup(function(){
 	this.setCustomValidity(errorMessage);
 	this.title = errorMessage;
 });
+
+$(document).ready(function(){
+	//-- Get additional information
+	$.get('/password',{token: $('[name=token]').val()},function(json){
+		if(json.status === 0) {
+			$('[name=name]').val(json.name);
+		}
+		else {
+			showMessage($('.message-panel span'),'text-danger', json.message);
+		}
+	},'json');
+});

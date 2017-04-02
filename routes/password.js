@@ -8,6 +8,30 @@ const EmailTemplate = require('email-templates').EmailTemplate;
 const mailer = require('../lib/mailer');
 const path = require('path');
 
+router.get('/', function (req, res, next) {
+	res.setHeader('Content-Type', 'application/json');
+	Token.findById(req.query.token, function(err, token) {
+		if(err || !token) {
+			return res.send({
+				status: 1,
+				message: 'Cannot retrieve account details (token)'
+			});
+		}
+		User.findById(token.target.id, function(err, user){
+			if(err) {
+				return res.send({
+					status: 2,
+					message: 'Cannot retrieve account details (user)'
+				});
+			}
+			res.send({
+				status: 0,
+				name: (user && user.name) ? user.name : ''
+			});
+		});
+	});
+});
+
 router.post('/update', function (req, res, next) {
 	res.setHeader('Content-Type', 'application/json');
 	Token.findById(req.body.token, function(err, token) {
@@ -44,6 +68,7 @@ router.post('/update', function (req, res, next) {
 				});
 			}
 			user.pass = req.body.password;
+			user.name = req.body.name;
 			user.save(function(err, user){
 				if(err) {
 					return res.send({
@@ -61,7 +86,7 @@ router.post('/update', function (req, res, next) {
 					}
 					res.send({
 						status: 0,
-						message: 'Your password has been successfully updated.'
+						message: 'Your account has been successfully updated.'
 					});
 				});
 			});
