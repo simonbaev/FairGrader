@@ -10,13 +10,14 @@ const sharedSession = require('express-socket.io-session');
 const socketio = require('socket.io');
 const mongoose = require('mongoose');
 //-- Routes
-const evaluation = require('./routes/eval');
+const evalold = require('./routes/eval_old');
 const init = require('./routes/init');
 const index = require('./routes/index');
 const login = require('./routes/login');
 const password = require('./routes/password');
 const email = require('./routes/emailLink');
 const reports = require('./routes/reports');
+const evals = require('./routes/eval');
 const signup = require('./routes/signup');
 const logout = require('./routes/logout');
 //-- Express initialization
@@ -50,10 +51,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/eval', evaluation);
+app.use('/evalold', evalold);
 app.use('/email', email);
 app.use('/login', login);
 app.use('/reports', reports(io.of('/reports').use(sharedSession(session))));
+app.use('/eval', evals(io.of('/eval').use(sharedSession(session))));
 app.use('/logout', logout);
 app.use('/signup', signup);
 app.use('/password', password);

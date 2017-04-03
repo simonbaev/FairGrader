@@ -1,47 +1,67 @@
 body,
 html {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	height: 100%;
+   margin: 0;
+   padding: 0;
+   width: 100%;
+   height: 100%;
 }
+
 .vgap {
-	height: 51px;
+   height: 51px;
 }
-.list-unstyled li {
-	margin-left: 25px;
-}
-fieldset {
-	margin-left: 30px;
-}
+
 .flex-column {
-	display: flex;
-	flex-direction: column;
+   display: flex;
+   flex-direction: column;
 }
+
 .flex-row {
-	display: flex;
-	flex-direction: row;
+   display: flex;
+   flex-direction: row;
 }
+
 .flex-h-center {
-	display: flex;
-	justify-content: center;
+   display: flex;
+   justify-content: center;
 }
+
 .flex-v-center {
-	display: flex;
-	align-items: center;
+   display: flex;
+   align-items: center;
 }
+
 .flex-center {
-	display: flex;
-	align-items: center;
-	justify-content: center;
+   display: flex;
+   align-items: center;
+   justify-content: center;
 }
+/*
+	Error message block
+*/
 .eval-error {
-	width: 75vw;
-	height: 50vh;
-	min-width: 400px;
-	max-width: 600px;
+   width: 75vw;
+   height: 50vh;
+   min-width: 400px;
+   max-width: 600px;
 }
 .eval-error > .mypanel {
-	margin: 10px 0;
-	padding: 20px;
+   margin: 10px 0;
+   padding: 20px;
 }
+/*
+	Body
+*/
+.button-container {
+	margin-top: 30px;
+}
+.eval-body {
+   width: 100%;
+   max-width: 850px;
+}
+fieldset {
+	margin-top: 30px;
+}
+.fieldset-content {
+	margin-left: 50px;
+}
+

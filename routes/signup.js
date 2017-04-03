@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../lib/models/user');
 const Token = require('../lib/models/token');
-const uuid = require('node-uuid');
+const uuid = require('uuid');
 const EmailTemplate = require('email-templates').EmailTemplate;
 const mailer = require('../lib/mailer');
 const path = require('path');
@@ -24,10 +24,10 @@ router.post('/', function (req, res, next) {
 				message: 'Cannot analyze provided e-mail: ' + err.message
 			});
 		}
-		if(user && user.confirmed) {
+		if(user) {
 			return res.send({
 				status: 2,
-				message: 'This account is already in use'
+				message: 'This account is already in use. Please login or recover forgotten password'
 			});
 		}
 		if(!/[@](radar[.])?gsw[.]edu$/.test(req.body.email)) {
