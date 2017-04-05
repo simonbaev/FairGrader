@@ -4,6 +4,7 @@ const express = require('express');
 const router = express.Router();
 const User = require('../lib/models/user');
 const Report = require('../lib/models/report');
+const Student = require('../lib/models/student');
 
 function termCodeToString(termCode) {
 	let year = termCode.slice(0,4);

@@ -1,9 +1,17 @@
 /* jshint esnext: true */
+let sockets = {
+	report: io('/reports'),
+	api: io('/api')
+};
 
-let socket = io('/reports');
-socket
+sockets.api
 .on('connect',function(){
-	console.log('Data socket successfully connected to', JSON.stringify(socket.id,null,3));
+	console.log('API socket successfully connected');
+});
+
+sockets.report
+.on('connect',function(){
+	console.log('Data socket successfully connected');
 })
 .on('data', function(data){
 	//-- Set term select
@@ -248,12 +256,17 @@ socket
 							min: Math.min.apply(null,array).toFixed(2)
 						};
 					};
+
+					let cbEmailToName = function(err,name) {
+						console.log(name || this);
+					};
 					for(let rowKey of displayKeys) {
 						let shortName = 'S' + (++i);
 						//-- calculate stats
 						let contributions = Object.keys(displayData[rowKey].contributions).map(scoreExtractor.bind(displayData[rowKey].contributions));
 						let stats = getStats(contributions);
 						//-- tooltip over e-mail
+						sockets.api.emit('emailToName', rowKey, cbEmailToName.bind(rowKey));
 						let titleString = $('<div>')
 						.append(
 							$('<table>')

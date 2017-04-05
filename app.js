@@ -20,6 +20,8 @@ const reports = require('./routes/reports');
 const evals = require('./routes/eval');
 const signup = require('./routes/signup');
 const logout = require('./routes/logout');
+//-- API
+const api = require('./lib/api');
 //-- Express initialization
 const io = new socketio();
 const app = express();
@@ -61,6 +63,9 @@ app.use('/signup', signup);
 app.use('/password', password);
 app.use('/init', init);
 
+//-- Setup Socket.IO API
+api.setup(io.of('/api').use(sharedSession(session)));
+
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
 	var err = new Error('Not Found');
@@ -73,7 +78,6 @@ app.use(function(err, req, res, next) {
 	// set locals, only providing error in development
 	res.locals.message = err.message;
 	res.locals.error = req.app.get('env') === 'development' ? err : {};
-
 	// render the error page
 	res.status(err.status || 500);
 	res.render('error');
