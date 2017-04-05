@@ -206,14 +206,19 @@ sockets.report
 						return entry.text;
 					});
 					let commentsContainer = $('#comments').empty();
-					comments.forEach(function(comment){
-						commentsContainer
-						.append(
-							$('<blockquote>')
-							.append($('<p>').text(comment.text))
-							.append($('<footer>').html('From student <i>' + comment.commenter + '</i>'))
-						);
-					});
+					if(comments.length) {
+						comments.forEach(function(comment){
+							commentsContainer
+							.append(
+								$('<blockquote>')
+								.append($('<p>').text(comment.text))
+								.append($('<footer>').html('From student <i>' + comment.commenter + '</i>'))
+							);
+						});
+					}
+					else {
+						commentsContainer.parent('fieldset').remove();
+					}
 				}
 				else {
 					//-- Faculty case, render a summary table
@@ -257,57 +262,69 @@ sockets.report
 						};
 					};
 
-					let cbEmailToName = function(err,name) {
+					let cbEmailToName = function(err, student) {
+
 						console.log(name || this);
 					};
-					for(let rowKey of displayKeys) {
+					displayKeys.forEach(function(rowKey) {
 						let shortName = 'S' + (++i);
 						//-- calculate stats
 						let contributions = Object.keys(displayData[rowKey].contributions).map(scoreExtractor.bind(displayData[rowKey].contributions));
 						let stats = getStats(contributions);
 						//-- tooltip over e-mail
-						sockets.api.emit('emailToName', rowKey, cbEmailToName.bind(rowKey));
-						let titleString = $('<div>')
-						.append(
-							$('<table>')
-							.append($('<tr>').append($('<th>').attr({'colspan':'2'}).css('border-bottom','1px solid').text(rowKey)))
-							.append($('<tr>').append($('<td>').text('Average')).append($('<td>').text(stats.average)))
-							.append($('<tr>').append($('<td>').text('Deviation')).append($('<td>').text(stats.deviation)))
-							.append($('<tr>').append($('<td>').text('Maximum')).append($('<td>').text(stats.max)))
-							.append($('<tr>').append($('<td>').text('Minimum')).append($('<td>').text(stats.min)))
-						)
-						.find('td').addClass('text-left').end().html();
-						//-- fill in <tr> element
-						container.find('.table thead tr').append($('<th>').addClass('text-center').text(shortName));
-						let tr = $('<tr>')
-						.append(
-							$('<td>')
-							.addClass('text-primary')
-							.attr({
-								'title': titleString,
-								'data-toggle': 'tooltip'
-							})
-							.text(rowKey)
-						)
-						.append($('<th>').text(shortName));
-						for(let colKey of displayKeys) {
-							let contribution = displayData[rowKey].contributions[colKey];
-							let td = $('<td>').text(contribution ? contribution.score.toFixed(2) : '--');
-							if(contribution && contribution.comment) {
-								td.attr({
-									'title': contribution.comment,
+						sockets.api.emit('getStudentByEmail', rowKey, function(err, student){
+							let studentName = '';
+							if(err || !student || !student.firstName || !student.lastName) {
+								studentName = rowKey;
+							}
+							else {
+								studentName = student.firstName + ' ' + student.lastName;
+							}
+							//-- Tooltip over student name
+							let titleString = $('<div>')
+							.append(
+								$('<table>')
+								.addClass('stat-tooltip')
+								.append($('<tr>').append($('<td>').text('Average')).append($('<td>').text(stats.average)))
+								.append($('<tr>').append($('<td>').text('Deviation')).append($('<td>').text(stats.deviation)))
+								.append($('<tr>').append($('<td>').text('Maximum')).append($('<td>').text(stats.max)))
+								.append($('<tr>').append($('<td>').text('Minimum')).append($('<td>').text(stats.min)))
+							)
+							.find('td').addClass('text-left').end().html();
+							//-- fill in <tr> element
+							container.find('.table thead tr').append($('<th>').addClass('text-center').text(shortName));
+							let tr = $('<tr>')
+							.append(
+								$('<td>')
+								.addClass('text-primary')
+								.attr({
+									'title': titleString,
 									'data-toggle': 'tooltip'
 								})
-								.addClass('text-primary')
-								.css({
-									'font-weight': 'bold',
-								});
+								.text(studentName)
+							)
+							.append($('<th>').text(shortName));
+							for(let colKey of displayKeys) {
+								let contribution = displayData[rowKey].contributions[colKey];
+								let td = $('<td>').text(contribution ? contribution.score.toFixed(2) : '--');
+								if(colKey === rowKey) {
+									td.addClass('diagonal');
+								}
+								if(contribution && contribution.comment) {
+									td.attr({
+										'title': contribution.comment,
+										'data-toggle': 'tooltip'
+									})
+									.addClass('text-primary')
+									.css({
+										'font-weight': 'bold',
+									});
+								}
+								tr.append(td).find('[data-toggle="tooltip"]').tooltip({container: 'body', html: true});
 							}
-							tr.append(td);
-						}
-						container.find('.table tbody').append(tr);
-					}
-					container.find('[data-toggle="tooltip"]').tooltip({container: 'body', html: true});
+							container.find('.table tbody').append(tr);
+						});
+					});
 				}
 			})
 			.trigger('change');

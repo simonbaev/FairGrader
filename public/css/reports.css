@@ -103,3 +103,20 @@ fieldset {
    top: 0;
    left: 0
 }
+
+.stat-tooltip tr td:first-child {
+	min-width: 75px;
+	border-right: 1px solid;
+}
+.stat-tooltip td {
+	padding: 5px;
+}
+.stat-tooltip tr {
+	border-bottom: 1px solid;
+}
+.stat-tooltip tr:last-child {
+	border-bottom: none;
+}
+.diagonal {
+	background-color: lightgray;
+}

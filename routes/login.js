@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../lib/models/user');
+const Student = require('../lib/models/student');
 
 const authenticateUser = function(email,password,fn) {
 	User.findOne({email: email},function(err,user){
@@ -43,11 +44,13 @@ router.post('/', function (req, res, next) {
 			if(!user) {
 				return next(new Error('Username and/or password are incorrect'));
 			}
-			let nextHop = req.session.next || '/';
-			req.session.faculty = user.faculty;
-			req.session.uid = user._id;
-			req.session.name = user.name || (user.faculty ? 'Faculty' : 'Student');
-			res.redirect(nextHop);
+			Student.findOne({email:user.email}).lean().exec(function(err, entry){
+				let nextHop = req.session.next || '/';
+				req.session.faculty = user.faculty;
+				req.session.uid = user._id;
+				req.session.name = user.name || (user.faculty ? 'Faculty' : (!err && entry && entry.lastName && entry.firstName ? (entry.firstName + ' ' + entry.lastName) : 'Student'));
+				res.redirect(nextHop);
+			});
 		}
 	});
 });
