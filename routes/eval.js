@@ -20,10 +20,23 @@ router.get(['/:term', '/:term/:course', '/:term/:course/:project'], function (re
 	let course = req.params.course;
 	let project = req.params.project;
 	if((term && /^20[012]\d0[257]$/.test(term)) && (course && /^[A-Z]{3,5}_\d{3,5}$/.test(course)) && project) {
-		console.log(term,course,project);
-		res.render('eval_process', {
-			session: req.session,
-			project: {}
+		Project.findOne({
+			active: true,
+			term: term,
+			'course.key': course,
+			'project.key': project
+		})
+		.lean()
+		.exec(function(err,projectItem){
+			if(err || !projectItem) {
+				return res.redirect(req.baseUrl);
+			}
+			res.render('eval_process', {
+				session: req.session,
+				term: term,
+				course: course,
+				project: project
+			});
 		});
 	}
 	else {
@@ -50,65 +63,69 @@ router.get('/', function (req, res, next) {
 		});
 	});
 });
-
-function copyArrayOfObjects(data) {
-	let result = [];
-	for(let item of data) {
-		delete item._id;
-		result.push(JSON.parse(JSON.stringify(item)));
-	}
-	return result;
-}
-
 module.exports = function(io) {
 	io
 	.on('connect', function(socket){
-		User.findById(socket.handshake.session.uid, function(err, user){
-			if(err || !user) {
-				return socket.emit('error', 'Cannot retrieve details on authenticated session, please re-login');
-			}
-			Project.find({
-				active: true
+		socket
+		.on('getProjects', function(request, cb) {
+			User.findById(socket.handshake.session.uid, function(err, user){
+				if(err || !user) {
+					return cb(new Error('Cannot retrieve details on authenticated session, please re-login'));
+				}
+				Project.find({
+					active: true
+				})
+				.lean()
+				.exec(function(err, projects){
+					if(err || !projects.length) {
+						return cb(new Error('Cannot find active projects'));
+					}
+					let data = {};
+					projects.forEach(function(projectItem){
+						let students = projectItem.students.map(function(entry){
+							return entry.email;
+						});
+						if((!user.faculty && students.indexOf(user.email) !== -1) || user.faculty) {
+							if(!data[projectItem.term]) {
+								data[projectItem.term] = {
+									title: termCodeToString(projectItem.term),
+									courses: {}
+								};
+							}
+							let term = data[projectItem.term];
+							if(!term.courses[projectItem.course.key]) {
+								term.courses[projectItem.course.key] = {
+									title: projectItem.course.title,
+									projects: {}
+								};
+							}
+							let course = term.courses[projectItem.course.key];
+							if(!course.projects[projectItem.project.key]) {
+								course.projects[projectItem.project.key] = {
+									title: projectItem.project.title,
+								};
+							}
+							let project = course.projects[projectItem.project.key];
+						}
+					});
+					cb(null, data);
+				});
+			});
+		})
+		.on('getProjectDetails', function(request, cb){
+			console.log(request);
+			Project.findOne({
+				active: true,
+				term: request.term,
+				'course.key': request.course,
+				'project.key': request.project
 			})
 			.lean()
-			.exec(function(err, projects){
-				if(err || !projects.length) {
-					return socket.emit('error', 'Cannot find active projects');
+			.exec(function(err,projectItem){
+				if(err || !projectItem) {
+					return cb(new Error('Cannot retrieve scpecified project for evaluation'));
 				}
-				let data = {};
-				projects.forEach(function(projectItem){
-					let students = projectItem.students.map(function(entry){
-						return entry.email;
-					});
-					if((!user.faculty && students.indexOf(user.email) !== -1) || user.faculty) {
-						if(!data[projectItem.term]) {
-							data[projectItem.term] = {
-								title: termCodeToString(projectItem.term),
-								courses: {}
-							};
-						}
-						let term = data[projectItem.term];
-						if(!term.courses[projectItem.course.key]) {
-							term.courses[projectItem.course.key] = {
-								title: projectItem.course.title,
-								projects: {}
-							};
-						}
-						let course = term.courses[projectItem.course.key];
-						if(!course.projects[projectItem.project.key]) {
-							course.projects[projectItem.project.key] = {
-								title: projectItem.project.title,
-								topics: copyArrayOfObjects(projectItem.topics),
-								classification: projectItem.project.classification,
-								criteria: copyArrayOfObjects(projectItem.project.criteria),
-								students: students
-							};
-						}
-						let project = course.projects[projectItem.project.key];
-						console.log(JSON.stringify(project,null,3));
-					}
-				});
-				socket.emit('init', data);
+				cb(null,projectItem);
 			});
 		});
 	});
