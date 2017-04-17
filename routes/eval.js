@@ -63,6 +63,7 @@ router.get('/', function (req, res, next) {
 		});
 	});
 });
+
 module.exports = function(io) {
 	io
 	.on('connect', function(socket){
@@ -125,7 +126,7 @@ module.exports = function(io) {
 				if(err || !projectItem) {
 					return cb(new Error('Cannot retrieve scpecified project for evaluation'));
 				}
-				cb(null,projectItem);
+				cb(null, projectItem);
 			});
 		});
 	});
