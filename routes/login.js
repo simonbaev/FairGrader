@@ -45,6 +45,7 @@ router.post('/', function (req, res, next) {
 				return next(new Error('Username and/or password are incorrect'));
 			}
 			Student.findOne({email:user.email}).lean().exec(function(err, entry){
+				console.log(entry);
 				let nextHop = req.session.next || '/';
 				req.session.faculty = user.faculty;
 				req.session.uid = user._id;

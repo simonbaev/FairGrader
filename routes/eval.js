@@ -31,7 +31,7 @@ router.get(['/:term', '/:term/:course', '/:term/:course/:project'], function (re
 			if(err || !projectItem) {
 				return res.redirect(req.baseUrl);
 			}
-			res.render('eval_process', {
+			res.render('eval_process.pug', {
 				session: req.session,
 				term: term,
 				course: course,
