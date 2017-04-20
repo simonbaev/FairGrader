@@ -6,6 +6,10 @@ html {
    height: 100%;
 }
 
+h1, h2, h3, h4, legend {
+	text-shadow: 1px 1px 2px #ccc;
+}
+
 .vgap {
    height: 51px;
 }
@@ -20,13 +24,11 @@ html {
    flex-direction: row;
 }
 
-.flex-h-center {
-   display: flex;
+.flex-main-center {
    justify-content: center;
 }
 
-.flex-v-center {
-   display: flex;
+.flex-aux-center {
    align-items: center;
 }
 
@@ -63,5 +65,8 @@ fieldset {
 }
 .fieldset-content {
 	margin-left: 50px;
+}
+#scores tbody tr td:first-child {
+	white-space: nowrap;
 }
 

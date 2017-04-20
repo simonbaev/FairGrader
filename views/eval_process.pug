@@ -9,14 +9,28 @@ html(lang='en')
 		link(rel='stylesheet', href='/css/eval.css')
 	body
 		include navbar
+		div#project-coordinates(data-term=term, data-course=course, data-project=project)
 		.container-fluid
-			.flex-center
-				h1 Project evaluation
+			.flex-column.flex-aux-center
+				h2= title.course
+				h3= title.project
 			fieldset
 				legend Instructions
 				.fieldset-content
-					p  Bla-Bla-Bla
-			div#project-coordinates(data-term=term, data-course=course, data-project=project)
+					ol
+						li
+							p Select the team (project topic)
+							.form-group
+								select#select-team.form-control
+						li: p Evaluate #[b each] member of the team by dragging provided sliders while monitoring the calculated score. When finished, press Submit button.
+						li: p Repeat the process with other teams
+			fieldset
+				legend Playground
+				.fieldset-content
+					table.table.table-bordered#scores
+						thead
+						tbody
+
 		script(src='//code.jquery.com/jquery-3.1.1.min.js')
 		script(src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')
 		script(src='//cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js')

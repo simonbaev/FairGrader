@@ -35,7 +35,11 @@ router.get(['/:term', '/:term/:course', '/:term/:course/:project'], function (re
 				session: req.session,
 				term: term,
 				course: course,
-				project: project
+				project: project,
+				title: {
+					course: projectItem.course.key.replace('_',' ') + ' ' + projectItem.course.title,
+					project: projectItem.project.title,
+				}
 			});
 		});
 	}
@@ -74,7 +78,10 @@ module.exports = function(io) {
 					return cb(new Error('Cannot retrieve details on authenticated session, please re-login'));
 				}
 				Project.find({
-					active: true
+					$and: [
+						{ active: true	},
+						user.faculty ?	{ facultyAccess: { $elemMatch: {	$eq: user.email } } } : { "students.email": user.email }
+					]
 				})
 				.lean()
 				.exec(function(err, projects){
@@ -86,7 +93,7 @@ module.exports = function(io) {
 						let students = projectItem.students.map(function(entry){
 							return entry.email;
 						});
-						if((!user.faculty && students.indexOf(user.email) !== -1) || user.faculty) {
+						//if((!user.faculty && students.indexOf(user.email) !== -1) || (user.faculty && projectItem.facultyAccess.indexOf(user.email) !== -1)) {
 							if(!data[projectItem.term]) {
 								data[projectItem.term] = {
 									title: termCodeToString(projectItem.term),
@@ -107,7 +114,7 @@ module.exports = function(io) {
 								};
 							}
 							let project = course.projects[projectItem.project.key];
-						}
+						//}
 					});
 					cb(null, data);
 				});

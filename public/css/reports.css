@@ -120,3 +120,6 @@ fieldset {
 .diagonal {
 	background-color: lightgray;
 }
+.class-report tbody tr td:first-child {
+	white-space: nowrap;
+}

@@ -49,7 +49,7 @@ module.exports = function(io) {
 	.on('connect', function(socket){
 		User.findById(socket.handshake.session.uid, function(err, user){
 			let data = {};
-			Report.find(user.faculty ? {facultyEmail: user.email} : { email: user.email })
+			Report.find(user.faculty ? {facultyAccess: {$elemMatch: {$eq: user.email}}} : { email: user.email })
 			.lean()
 			.exec(function(err,reports){
 				data = {};
