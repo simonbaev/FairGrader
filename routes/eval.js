@@ -85,7 +85,7 @@ router.post('/', function(req,res,next){
 			let reports = [];
 			let members = {};
 			for(let member of req.body.members) {
-				if(member.active) {
+				if(member.active === 'true') {
 					members[member.email] = member;
 				}
 			}
@@ -143,7 +143,8 @@ router.post('/', function(req,res,next){
 							reports.push(reportItem.save.bind(reportItem));
 						}
 						if(reports.length === Object.keys(members).length) {
-							async.parallel(reports,function(err, reports) {
+							console.log(reports.length);
+							async.parallel(reports, function(err, reports) {
 								if(err) {
 									return res.send({
 										status: 4,
@@ -160,7 +161,6 @@ router.post('/', function(req,res,next){
 					});
 				}
 			});
-
 		});
 	});
 });
