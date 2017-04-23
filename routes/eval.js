@@ -4,6 +4,8 @@ const express = require('express');
 const router = express.Router();
 const User = require('../lib/models/user');
 const Project = require('../lib/models/project');
+const Report = require('../lib/models/report');
+const async = require('async');
 
 function termCodeToString(termCode) {
 	let year = termCode.slice(0,4);
@@ -33,9 +35,7 @@ router.get(['/:term', '/:term/:course', '/:term/:course/:project'], function (re
 			}
 			res.render('eval_process.pug', {
 				session: req.session,
-				term: term,
-				course: course,
-				project: project,
+				id: projectItem._id,
 				title: {
 					course: projectItem.course.key.replace('_',' ') + ' ' + projectItem.course.title,
 					project: projectItem.project.title,
@@ -46,6 +46,123 @@ router.get(['/:term', '/:term/:course', '/:term/:course/:project'], function (re
 	else {
 		res.redirect(req.baseUrl);
 	}
+});
+
+router.post('/', function(req,res,next){
+	res.setHeader('Content-Type', 'application/json');
+	if(!req.session.uid) {
+		return res.send({
+			status: 1,
+			message: 'Session is not authenticated'
+		});
+	}
+	User.findById(req.session.uid, function(err, user){
+		if(err || !user) {
+			return res.send({
+				status: 2,
+				message: 'Cannot retrieve user account'
+			});
+		}
+		Project.findById(req.body.project, function(err, projectItem) {
+			if(err || !projectItem) {
+				return res.send({
+					status: 3,
+					message: 'Cannot synchronize submission with the selected project'
+				});
+			}
+			/*
+			if(projectItem.students.map(function(student){
+				return student.email;
+			}).indexOf(user.email) === -1) {
+				//-- This user cannot contribute to the evaluation
+				return res.send({
+					status: 100,
+					message: 'You are not authorized to contribute to this project'
+				});
+			}
+			*/
+			//-- Create a set of Reports for this particular contribution
+			let reports = [];
+			let members = {};
+			for(let member of req.body.members) {
+				if(member.active) {
+					members[member.email] = member;
+				}
+			}
+			//-- In the active project find the topic that matches topic in contribution
+			let topic = projectItem.topics.find(function(topic){
+				return topic.key === req.body.topic;
+			});
+			topic.students.forEach(function(studentEmail) {
+				if(studentEmail in members) {
+					//-- Check if report with same details already exists
+					Report.findOne({
+						'term': projectItem.term,
+						'course.key': projectItem.course.key,
+						'project.key': projectItem.project.key,
+						'topic.key': topic.key,
+						'contributor.email': user.email,
+						'email': studentEmail
+					})
+					.exec(function(err,reportItem){
+						if(err) {
+							return res.send({
+								status: 5,
+								message: 'Cannot access reports collection'
+							});
+						}
+						if(!reportItem) {
+							let report = new Report({
+								term: projectItem.term,
+								course: {
+									key: projectItem.course.key,
+									title: projectItem.course.title
+								},
+								project: {
+									key: projectItem.project.key,
+									title: projectItem.project.title
+								},
+								topic: {
+									key: topic.key,
+									title: topic.title
+								},
+								email: studentEmail,
+								facultyAccess: projectItem.facultyAccess,
+								contributor: {
+									email: user.email,
+									score: parseFloat(members[studentEmail].value),
+									comment: members[studentEmail].comment || null
+								}
+							});
+							reports.push(report.save.bind(report));
+						}
+						else {
+							//-- report needs to be overriden
+							reportItem.contributor.score = parseFloat(members[studentEmail].value);
+							reportItem.contributor.comment = members[studentEmail].comment || null;
+							reports.push(reportItem.save.bind(reportItem));
+						}
+						if(reports.length === Object.keys(members).length) {
+							async.parallel(reports,function(err, reports) {
+								if(err) {
+									return res.send({
+										status: 4,
+										message: 'Cannot save reports'
+									});
+								}
+								console.log(reports);
+								return res.send({
+									status: 0,
+									message: 'Success'
+								});
+							});
+						}
+					});
+				}
+			});
+
+		});
+	});
 });
 
 router.get('/', function (req, res, next) {
@@ -93,41 +210,33 @@ module.exports = function(io) {
 						let students = projectItem.students.map(function(entry){
 							return entry.email;
 						});
-						//if((!user.faculty && students.indexOf(user.email) !== -1) || (user.faculty && projectItem.facultyAccess.indexOf(user.email) !== -1)) {
-							if(!data[projectItem.term]) {
-								data[projectItem.term] = {
-									title: termCodeToString(projectItem.term),
-									courses: {}
-								};
-							}
-							let term = data[projectItem.term];
-							if(!term.courses[projectItem.course.key]) {
-								term.courses[projectItem.course.key] = {
-									title: projectItem.course.title,
-									projects: {}
-								};
-							}
-							let course = term.courses[projectItem.course.key];
-							if(!course.projects[projectItem.project.key]) {
-								course.projects[projectItem.project.key] = {
-									title: projectItem.project.title,
-								};
-							}
-							let project = course.projects[projectItem.project.key];
-						//}
+						if(!data[projectItem.term]) {
+							data[projectItem.term] = {
+								title: termCodeToString(projectItem.term),
+								courses: {}
+							};
+						}
+						let term = data[projectItem.term];
+						if(!term.courses[projectItem.course.key]) {
+							term.courses[projectItem.course.key] = {
+								title: projectItem.course.title,
+								projects: {}
+							};
+						}
+						let course = term.courses[projectItem.course.key];
+						if(!course.projects[projectItem.project.key]) {
+							course.projects[projectItem.project.key] = {
+								title: projectItem.project.title,
+							};
+						}
+						let project = course.projects[projectItem.project.key];
 					});
 					cb(null, data);
 				});
 			});
 		})
-		.on('getProjectDetails', function(request, cb){
-			console.log(request);
-			Project.findOne({
-				active: true,
-				term: request.term,
-				'course.key': request.course,
-				'project.key': request.project
-			})
+		.on('getProjectDetails', function(id, cb){
+			Project.findById(id)
 			.lean()
 			.exec(function(err,projectItem){
 				if(err || !projectItem) {

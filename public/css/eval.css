@@ -66,7 +66,32 @@ fieldset {
 .fieldset-content {
 	margin-left: 50px;
 }
-#scores tbody tr td:first-child {
+#scores tbody tr td:nth-child(0n+1) {
 	white-space: nowrap;
+}
+#scores tbody tr td:nth-child(0n+2) {
+	text-align: center;
+}
+#scores thead tr th:nth-child(0n+2) {
+	width: 50px;
+}
+#scores thead .th-total {
+	width: 70px;
+}
+#scores .slider {
+	width: 90% !important;
+	margin: 0 10px;
+}
+#scores .slider-selection,
+#scores .slider-track-high {
+	background: rgba(0, 200	, 255, 0.15);
+}
+.list-unstyled li {
+	margin-left: 25px;
+}
+.panel {
+	padding: 10px;
+	background-color: rgba(255, 204, 153, 0.4);
+	border-radius: 5px;
 }
 

@@ -26,10 +26,10 @@ router.get('/', function (req, res, next) {
 			});
 		}
 		let data = {};
-		Report.find(user.faculty ? {facultyEmail: user.email} : { email: user.email })
+		Report.find(user.faculty ? {facultyAccess: {$elemMatch: {$eq: user.email}}} : { email: user.email })
 		.lean()
 		.exec(function(err,reports){
-			if(err) {
+			if(err || !reports) {
 				return res.render('reports', {
 					status: 2,
 					message: 'Cannot retrieve report data',

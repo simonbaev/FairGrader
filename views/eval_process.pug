@@ -4,35 +4,45 @@ html(lang='en')
 		meta(charset='UTF-8')
 		meta(name='viewport', content='width=device-width, initial-scale=1.0')
 		meta(http-equiv='X-UA-Compatible', content='ie=edge')
+		meta(name='project-id', content=id)
 		title FairGrader@GSW
 		link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+		link(rel='stylesheet', href='//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/css/bootstrap-slider.min.css')
 		link(rel='stylesheet', href='/css/eval.css')
 	body
 		include navbar
-		div#project-coordinates(data-term=term, data-course=course, data-project=project)
 		.container-fluid
 			.flex-column.flex-aux-center
 				h2= title.course
 				h3= title.project
-			fieldset
-				legend Instructions
-				.fieldset-content
-					ol
-						li
-							p Select the team (project topic)
-							.form-group
-								select#select-team.form-control
-						li: p Evaluate #[b each] member of the team by dragging provided sliders while monitoring the calculated score. When finished, press Submit button.
-						li: p Repeat the process with other teams
-			fieldset
-				legend Playground
-				.fieldset-content
-					table.table.table-bordered#scores
-						thead
-						tbody
+			form
+				fieldset.instructions
+					legend Instructions
+					.fieldset-content
+						ol
+							li
+								p #[b Select] the team (project topic)
+								.form-group
+									select#select-team.form-control(name='topic')
+							li: p Use #[b Active] checkbox to indicate if a particular student needs to be included/excluded from group evaluation (e.g. uncheck the mark if a student is not present or if you, for some other reasons, cannot evaluate his/her contribution)
+							li: p Evaluate #[b each] member of the team by dragging provided sliders while monitoring the calculated score (column #[b local]). Do not evaluate your own team/topic.
+							li: p Class average score is displayed in #[b global] column and is updated in real-time
+							li: p When #[b finished], press 'Submit' button. Have in mind that newer submissions silently #[b override] previously existing ones.
+							li: p #[b Repeat] the process for other teams (topics)
+				fieldset.playground
+					legend Playground
+					.fieldset-content
+						.panel.bg-info
+							h4 Grading rubrics
+							ul.rubrics.list-unstyled
+						table.table.table-bordered#scores
+							thead
+							tbody
+						button.btn.btn-primary.pull-right(type='submit') Submit
 
 		script(src='//code.jquery.com/jquery-3.1.1.min.js')
 		script(src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')
 		script(src='//cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.4.0/bootbox.min.js')
+		script(src='//cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/9.7.2/bootstrap-slider.min.js')
 		script(src='/socket.io/socket.io.js')
 		script(src='/js/eval_process.js')
