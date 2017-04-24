@@ -70,17 +70,6 @@ router.post('/', function(req,res,next){
 					message: 'Cannot synchronize submission with the selected project'
 				});
 			}
-			/*
-			if(projectItem.students.map(function(student){
-				return student.email;
-			}).indexOf(user.email) === -1) {
-				//-- This user cannot contribute to the evaluation
-				return res.send({
-					status: 100,
-					message: 'You are not authorized to contribute to this project'
-				});
-			}
-			*/
 			//-- Create a set of Reports for this particular contribution
 			let reports = [];
 			let members = {};
@@ -151,7 +140,7 @@ router.post('/', function(req,res,next){
 										message: 'Cannot save reports'
 									});
 								}
-								console.log(reports);
+								console.log(JSON.stringify(reports,null,3));
 								return res.send({
 									status: 0,
 									message: 'Success'
@@ -187,6 +176,29 @@ router.get('/', function (req, res, next) {
 
 module.exports = function(io) {
 	let rooms = {};
+	let getRoomStat = function(room) {
+		//-- Parameter 'room' is an entry in array 'rooms' referenced by project._id
+		let stat = {};
+		for(let sid in room) {
+			for(let topic of Object.keys(room[sid])) {
+				if(!stat[topic]) {
+					stat[topic] = {};
+				}
+				for(let email in room[sid][topic]) {
+					if(!stat[topic][email]) {
+						stat[topic][email] = {
+							count: 0,
+							total: 0
+						};
+					}
+					stat[topic][email].count++;
+					stat[topic][email].total += room[sid][topic][email];
+				}
+			}
+		}
+		return stat;
+	};
+	//-----------
 	io
 	.on('connect', function(socket){
 		socket
@@ -251,9 +263,9 @@ module.exports = function(io) {
 			for(let room of Object.keys(rooms)) {
 				if(socket.id in rooms[room]) {
 					delete rooms[room][socket.id];
+					io.emit('update',getRoomStat(rooms[room]));
 				}
 			}
-			io.emit('disconnected');
 		})
 		.on('change', function(formData){
 			let thisRoom = formData.project;
@@ -264,31 +276,18 @@ module.exports = function(io) {
 			if(!rooms[thisRoom]) {
 				rooms[thisRoom] = {};
 			}
-			rooms[thisRoom][socket.id] = {};
-			rooms[thisRoom][socket.id][formData.topic] = {};
+			if(!rooms[thisRoom][socket.id]) {
+				rooms[thisRoom][socket.id]= {};
+			}
+			if(!rooms[thisRoom][socket.id][formData.topic]) {
+				rooms[thisRoom][socket.id][formData.topic] = {};
+			}
 			//-- Update this room
 			for(let member of formData.members) {
 				rooms[thisRoom][socket.id][formData.topic][member.email] = parseFloat(member.value);
 			}
 			//-- Calculate averages
-			let stat = {};
-			let room = rooms[thisRoom];
-			for(let sid in room) {
-				let topic = Object.keys(room[sid])[0];
-				if(!stat[topic]) {
-					stat[topic] = {};
-				}
-				for(let email in room[sid][topic]) {
-					if(!stat[topic][email]) {
-						stat[topic][email] = {
-							count: 0,
-							total: 0
-						};
-					}
-					stat[topic][email].count++;
-					stat[topic][email].total += room[sid][topic][email];
-				}
-			}
+			let stat = getRoomStat(rooms[thisRoom]);
 			console.log(JSON.stringify(rooms,null,3));
 			console.log(JSON.stringify(stat,null,3));
 			io.in(thisRoom).emit('update',stat);

@@ -81,7 +81,7 @@ fieldset {
 }
 #scores .slider {
 	width: 90% !important;
-	margin: 0 10px;
+	margin: 0 5%;
 }
 #scores .slider-selection,
 #scores .slider-track-high {
@@ -92,14 +92,14 @@ fieldset {
 }
 .panel {
 	padding: 10px;
-	background-color: rgba(255, 204, 153, 0.4);
+	background-color: rgba(255, 204, 153, 0.25);
 	border-radius: 5px;
 }
 .instructions legend {
 	cursor: pointer;
 }
 .instructions .fieldset-content {
-	display: none;
+	/*display: none;*/
 }
 .comment-container {
 	display: none;
@@ -110,6 +110,10 @@ fieldset {
 }
 .comment-container > textarea {
 	border-radius: 7px;
+}
+#here {
+	cursor: pointer;
+	text-decoration: none;
 }
 
 

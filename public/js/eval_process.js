@@ -17,19 +17,28 @@ sockets.eval
 	console.log(err.message);
 })
 .on('update', function(data){
-	console.log(data);
+	let topicItem = data[$('#select-team option:selected').val()];
+	if(topicItem) {
+		for(let email in topicItem) {
+			let avg = topicItem[email].total / topicItem[email].count;
+			$('#scores tbody td[data-email="' + email + '"]').next().text(avg.toFixed(2));
+		}
+	}
 })
 .on('disconnected', function(){
 	console.log($('meta[name=project-id]').attr('content'));
 });
 
 //-- Gather form data
-function getFormData() {
+function getFormData(email) {
+	email = email || null;
 	return {
 		project: $('meta[name=project-id]').attr('content'),
 		topic: $('#select-team option:selected').val(),
 		members: $('.total-local').toArray().map(function(td){
 			return td.dataset;
+		}).filter(function(member){
+			return email ? member.email === email : true;
 		})
 	};
 }
@@ -43,8 +52,8 @@ $(document).ready(function(){
 		let thead = $('#scores thead').empty();
 		let headerRow = $('<tr>').append($('<th>').text('Student name')).append($('<th>').text('Active'));
 		for(let criterium of data.project.criteria) {
-			headerRow.append($('<th>').text(criterium.key + ' (' + (criterium.weight * 100).toFixed(1) + '%)'));
-			$('.rubrics').append($('<li>').html('<span><b>[' + criterium.key + ']</b></span>&nbsp;<span>' + criterium.title + '</span>'));
+			headerRow.append($('<th>').text(criterium.key));
+			$('.rubrics').append($('<li>').html('<span><b>[' + criterium.key + ']</b></span>&nbsp;<span>' + criterium.title + '</span>&nbsp;(' + (criterium.weight * 100).toFixed(1) + '%)'));
 		}
 		headerRow
 		.append($('<th>').addClass('th-total').text('local'))
@@ -197,7 +206,7 @@ $(document).ready(function(){
 					tr.find('.total-local').text(value).attr('data-value',value);
 					//-- Global
 					if(e.type === 'slideStop') {
-						sockets.eval.emit('change', getFormData());
+						sockets.eval.emit('change', getFormData(tr.find('.total-local').attr('data-email')));
 					}
 				};
 				tr.find('input[name=slider]').on('slide', slideHandler).on('slideStop', slideHandler);
@@ -208,7 +217,7 @@ $(document).ready(function(){
 					'data-active': defaultActive,
 				}));
 				//-- Add total (global)
-				tr.append($('<td>').addClass('total-global').text(0));
+				tr.append($('<td>').addClass('total-global').text('N/A'));
 				tbody.append(tr);
 			};
 			//-- Resolve student email into name
@@ -238,6 +247,9 @@ $(document).ready(function(){
 		setTimeout(function(){
 			$('.instructions').find('legend').next().slideUp(300);
 		}, 60 * 1000);
+		$('#here').click(function(){
+			$('.instructions .fieldset-content').slideUp();
+		});
 		//-- Submit action
 		$('form').submit(function(){
 			let data = getFormData();
