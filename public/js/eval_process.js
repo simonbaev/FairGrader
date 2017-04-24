@@ -15,7 +15,24 @@ sockets.eval
 })
 .on('reconnect_error', function(err){
 	console.log(err.message);
+})
+.on('update', function(data){
+	console.log(data);
+})
+.on('disconnected', function(){
+	console.log($('meta[name=project-id]').attr('content'));
 });
+
+//-- Gather form data
+function getFormData() {
+	return {
+		project: $('meta[name=project-id]').attr('content'),
+		topic: $('#select-team option:selected').val(),
+		members: $('.total-local').toArray().map(function(td){
+			return td.dataset;
+		})
+	};
+}
 
 $(document).ready(function(){
 	sockets.eval.emit('getProjectDetails', $('meta[name=project-id]').attr('content'), function(err, data){
@@ -36,14 +53,16 @@ $(document).ready(function(){
 		//-- Team (topic) selector
 		let teamContainer = $('#select-team').empty();
 		data.topics.forEach(function(topic){
-			teamContainer
-			.append(
-				$('<option>')
-				.attr({
-					'value': topic.key
-				})
-				.text(topic.title)
-			);
+			if(topic.students.indexOf($('meta[name=myself]').attr('content')) === -1) {
+				teamContainer
+				.append(
+					$('<option>')
+					.attr({
+						'value': topic.key
+					})
+					.text(topic.title)
+				);
+			}
 		});
 		teamContainer
 		.find('option:eq(0)').attr('selected','').end()
@@ -59,7 +78,71 @@ $(document).ready(function(){
 			//-- Append new row into <tbody> with just resolved student name
 			let addRow = function(email, studentName) {
 				let tr = $('<tr>');
-				tr.append($('<td>').text(studentName));
+				//-- Student name and comment field
+				tr.append($('<td>').text(studentName).click(function(){
+					let $this = $(this);
+					let tr = $(this).parent();
+					let trNext = tr.next();
+					if(trNext.hasClass('comment')) {
+						let container = trNext.find('.comment-container');
+						let td = container.parent();
+						if(container.is(':visible')) {
+							container.slideToggle(300, function(){
+								td.animate({'padding':'0px'}, 100);
+							});
+						}
+						else {
+							td.animate({'padding':'8px'}, 100, function() {
+								container.slideToggle(300);
+							});
+						}
+					}
+					else {
+						let container = $('<div>')
+						.addClass('comment-container')
+						.append(
+							$('<h4>').text('Comment')
+						)
+						.append(
+							$('<textarea>').addClass('form-control').attr({
+								'rows': '3',
+								'name': 'comment',
+								'placeholder': 'Enter anonymous comment for ' + studentName + '. Your comment will be saved along with submission.'
+							})
+							.on('change', function(){
+								if($(this).val().length > 0) {
+									if($this.find('.glyphicon').length === 0) {
+										$this.append($('<span>').addClass('pull-right glyphicon glyphicon-list-alt'));
+									}
+									tr.find('.total-local').attr('data-comment', $(this).val());
+								}
+								else {
+									$this.find('.glyphicon').remove();
+									tr.find('.total-local').removeAttr('data-comment');
+								}
+							})
+						)
+						.append(
+							$('<button>')
+							.addClass('btn btn-default pull-right')
+							.attr({
+								'type': 'button'
+							})
+							.text('Reset')
+							.click(function(){
+								$(this).siblings('textarea').val('').trigger('change');
+								return false;
+							})
+						);
+						tr.after(
+							$('<tr>').addClass('comment bg-success')
+							.append(
+								$('<td>').attr('colspan', '' + (4 + data.project.criteria.length)).append(container)
+							)
+						);
+						container.slideDown(300);
+					}
+				}));
 				//-- Add Active checkbox
 				let cb = cbTemplate.clone();
 				if(defaultActive) {
@@ -102,18 +185,24 @@ $(document).ready(function(){
 				tr.find('input[name=slider]').slider();
 				//-- Register slider event(s)
 				let slideHandler = function(e){
+					//-- Calculation
 					let result = 0;
 					let tr = $(this).parents('tr');
 					let sliders = tr.find('input[name=slider]').toArray();
 					for(let slider of sliders) {
 						result += slider.value * slider.dataset.weight;
 					}
+					//-- Local
 					let value = result.toFixed(2);
 					tr.find('.total-local').text(value).attr('data-value',value);
+					//-- Global
+					if(e.type === 'slideStop') {
+						sockets.eval.emit('change', getFormData());
+					}
 				};
 				tr.find('input[name=slider]').on('slide', slideHandler).on('slideStop', slideHandler);
 				//-- Add total (local)
-				tr.append($('<td>').addClass('total-local').text(0).attr({
+				tr.append($('<td>').addClass('total-local').text('N/A').attr({
 					'data-email': email,
 					'data-value': 0,
 					'data-active': defaultActive,
@@ -144,21 +233,11 @@ $(document).ready(function(){
 		.trigger('change');
 		//-- Add Instructions toggler (click on "Instructions" legend to toggle)
 		$('.instructions').find('legend').click(function(){
-			$(this).next().toggle(1000);
+			$(this).next().slideToggle(300);
 		});
 		setTimeout(function(){
-			$('.instructions').find('legend').trigger('click');
+			$('.instructions').find('legend').next().slideUp(300);
 		}, 60 * 1000);
-		//-- Gather form data
-		function getFormData() {
-			return {
-				project: $('meta[name=project-id]').attr('content'),
-				topic: $('#select-team option:selected').val(),
-				members: $('.total-local').toArray().map(function(td){
-					return td.dataset;
-				})
-			};
-		}
 		//-- Submit action
 		$('form').submit(function(){
 			let data = getFormData();

@@ -47,6 +47,7 @@ router.post('/', function (req, res, next) {
 			Student.findOne({email:user.email}).lean().exec(function(err, entry){
 				let nextHop = req.session.next || '/';
 				req.session.faculty = user.faculty;
+				req.session.email = user.email;
 				req.session.uid = user._id;
 				req.session.name = user.name || (user.faculty ? 'Faculty' : (!err && entry && entry.lastName && entry.firstName ? (entry.firstName + ' ' + entry.lastName) : 'Student'));
 				res.redirect(nextHop);

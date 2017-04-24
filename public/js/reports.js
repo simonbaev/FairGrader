@@ -221,6 +221,7 @@ sockets.report
 					}
 				}
 				else {
+					console.log(data);
 					//-- Faculty case, render a summary table
 					container
 					.append(

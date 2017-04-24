@@ -186,6 +186,7 @@ router.get('/', function (req, res, next) {
 });
 
 module.exports = function(io) {
+	let rooms = {};
 	io
 	.on('connect', function(socket){
 		socket
@@ -242,8 +243,55 @@ module.exports = function(io) {
 				if(err || !projectItem) {
 					return cb(new Error('Cannot retrieve scpecified project for evaluation'));
 				}
+				socket.join(projectItem._id);
 				cb(null, projectItem);
 			});
+		})
+		.on('disconnect', function(){
+			for(let room of Object.keys(rooms)) {
+				if(socket.id in rooms[room]) {
+					delete rooms[room][socket.id];
+				}
+			}
+			io.emit('disconnected');
+		})
+		.on('change', function(formData){
+			let thisRoom = formData.project;
+			if(Object.keys(socket.rooms).indexOf(thisRoom) === -1) {
+				socket.join(thisRoom);
+			}
+			//-- Initialize room data
+			if(!rooms[thisRoom]) {
+				rooms[thisRoom] = {};
+			}
+			rooms[thisRoom][socket.id] = {};
+			rooms[thisRoom][socket.id][formData.topic] = {};
+			//-- Update this room
+			for(let member of formData.members) {
+				rooms[thisRoom][socket.id][formData.topic][member.email] = parseFloat(member.value);
+			}
+			//-- Calculate averages
+			let stat = {};
+			let room = rooms[thisRoom];
+			for(let sid in room) {
+				let topic = Object.keys(room[sid])[0];
+				if(!stat[topic]) {
+					stat[topic] = {};
+				}
+				for(let email in room[sid][topic]) {
+					if(!stat[topic][email]) {
+						stat[topic][email] = {
+							count: 0,
+							total: 0
+						};
+					}
+					stat[topic][email].count++;
+					stat[topic][email].total += room[sid][topic][email];
+				}
+			}
+			console.log(JSON.stringify(rooms,null,3));
+			console.log(JSON.stringify(stat,null,3));
+			io.in(thisRoom).emit('update',stat);
 		});
 	});
 	return router;
