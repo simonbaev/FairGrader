@@ -1,0 +1,45 @@
+doctype html
+html(lang='en')
+	head
+		meta(charset='UTF-8')
+		meta(name='viewport', content='width=device-width, initial-scale=0.75, minimum-scale=0.75, maximum-scale=1.0')
+		meta(http-equiv='X-UA-Compatible', content='ie=edge')
+		title FairGrader@GSW
+		link(rel='stylesheet', href='//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css')
+		link(rel='stylesheet', href='/bower_components/chartist/dist/chartist.min.css')
+		link(rel='stylesheet', href='/css/reports.css')
+	body
+		include navbar
+		if status !== 0
+			if typeof message !== 'string' || !message
+				-message = "Cannot retrieve error details"
+			.container-fluid.flex-row.flex-h-center
+				.reports-error.flex-column.flex-center
+					meta(http-equiv='refresh', content="10;URL='/'")
+					.mypanel.header-panel
+						h3.text-danger  Error
+						p= message
+		else
+			.container-fluid
+				.flex-center
+					h1 Reports page
+				fieldset
+					legend  Project Selector
+					.fieldset-content
+						.row
+							.form-group.col-sm-2.col-xs-6
+								label Term
+								select#select-term.form-control
+									option(value='--') --
+							.form-group.col-sm-4.col-xs-6
+								label Course
+								select#select-course.form-control
+									option(value='--') --
+							.form-group.col-sm-6.col-xs-12
+								label Project
+								select#select-project.form-control
+									option(value='--') --
+				fieldset
+					legend  Report details
+					#report-details.fieldset-content
+
