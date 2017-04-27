@@ -10,7 +10,6 @@ const sharedSession = require('express-socket.io-session');
 const socketio = require('socket.io');
 const mongoose = require('mongoose');
 //-- Routes
-const evalold = require('./routes/eval_old');
 const init = require('./routes/init');
 const index = require('./routes/index');
 const login = require('./routes/login');
@@ -54,7 +53,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', index);
-app.use('/evalold', evalold);
 app.use('/email', email);
 app.use('/login', login);
 app.use('/reports', reports(io.of('/reports').use(sharedSession(session))));

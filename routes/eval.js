@@ -132,7 +132,6 @@ router.post('/', function(req,res,next){
 							reports.push(reportItem.save.bind(reportItem));
 						}
 						if(reports.length === Object.keys(members).length) {
-							console.log(reports.length);
 							async.parallel(reports, function(err, reports) {
 								if(err) {
 									return res.send({
@@ -140,7 +139,6 @@ router.post('/', function(req,res,next){
 										message: 'Cannot save reports'
 									});
 								}
-								console.log(JSON.stringify(reports,null,3));
 								return res.send({
 									status: 0,
 									message: 'Success'
@@ -288,8 +286,6 @@ module.exports = function(io) {
 			}
 			//-- Calculate averages
 			let stat = getRoomStat(rooms[thisRoom]);
-			console.log(JSON.stringify(rooms,null,3));
-			console.log(JSON.stringify(stat,null,3));
 			io.in(thisRoom).emit('update',stat);
 		});
 	});
