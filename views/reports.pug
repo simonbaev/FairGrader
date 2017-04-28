@@ -23,7 +23,7 @@ html(lang='en')
 			.container-fluid
 				.flex-center
 					h1 Reports page
-				fieldset
+				fieldset.project-selector
 					legend  Project Selector
 					.fieldset-content
 						.row
@@ -39,9 +39,13 @@ html(lang='en')
 								label Project
 								select#select-project.form-control
 									option(value='--') --
-				fieldset
+						.flex-h-center.button-container
+							.form-group
+								button#read.btn.btn-default View report
+
+				fieldset.report-details
 					legend  Report details
-					#report-details.fieldset-content
+					.fieldset-content
 
 		script(src='//code.jquery.com/jquery-3.1.1.min.js')
 		script(src='//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js')

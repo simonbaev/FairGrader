@@ -71,6 +71,10 @@ fieldset {
 	margin-left: 50px;
 }
 
+.report-details {
+	display: none;
+}
+
 .ct-label {
    font-size: 1em;
 }
@@ -134,4 +138,7 @@ fieldset {
 }
 .tr-comment {
 	display: none;
+}
+.button-container {
+	margin-top: 25px;
 }

@@ -1,29 +1,46 @@
 /* jshint esnext: true */
-let sockets = {
-	report: io('/reports2'),
-	api: io('/api')
-};
-
-sockets.api
-.on('connect',function(){
-	console.log('API socket successfully connected');
-});
-sockets.report
-.on('connect',function(){
+let socket = io('/reports2').on('connect',function(){
 	console.log('Data socket successfully connected');
 });
 
+let getStats = function(array) {
+	let average = array.reduce(function(acc,value){
+		return acc + value;
+	}, 0) / array.length;
+	let deviation = Math.sqrt(array.map(function(entry){
+		return Math.pow(entry - average, 2);
+	})
+	.reduce(function(acc,value){
+		return acc + value;
+	}, 0) / array.length);
+	return {
+		average: average.toFixed(2),
+		deviation: deviation.toFixed(2),
+		max: Math.max.apply(null,array).toFixed(2),
+		min: Math.min.apply(null,array).toFixed(2)
+	};
+};
+
 $(document).ready(function(){
-	sockets.report.emit('getData', function(data){
+	socket.emit('getData', function(data){
 		if(!data) {
 			console.error('No data to render');
 			return;
 		}
+		//-- Display report data
+		$('#read').click(function(){
+			$('.button-container').fadeOut(function(){
+				$('.report-details').fadeIn(function(){
+					$('#select-project').trigger('change');
+					console.log('done');
+				});
+			});
+		});
 		//-- Set term select
 		let termData = data;
 		let termKeys = Object.keys(data);
 		if(!termKeys.length) {
-			$('#report-details').empty().append($('<h4>').addClass('text-warning').text('No report data found'));
+			$('.report-details .fieldset-content').empty().append($('<h4>').addClass('text-warning').text('No report data found'));
 			return false;
 		}
 		let termSelect = $('#select-term').empty();
@@ -76,10 +93,152 @@ $(document).ready(function(){
 					//-- Update the chart or table
 					let option = $(this).find('option:selected');
 					let reportData = projectData[option.val()];
-					let container = $('#report-details').empty();
-					console.log(reportData);
+					let container = $('.report-details .fieldset-content').empty();
+					//-- Different views for faculty (all gradees) and student (only his/her reports)
 					if(reportData.gradees.length === 1) {
 						//-- Student's view (chart)
+						let gradee = reportData.gradees[0];
+						container
+						//-- Header (project topic)
+						.append(
+							$('<div>')
+							.addClass('flex-center')
+							.append($('<h4>').text(reportData.topics[gradee].title))
+						)
+						//-- Chart
+						.append(
+							$('<div>')
+							.addClass('ct-chart ct-my')
+						)
+						//-- Stat data
+						.append(
+							$('<fieldset>')
+							.append($('<legend>').text('Statistical analysis'))
+							.append(
+								$('<div>')
+								.addClass('fieldset-content')
+								.append(
+									$('<table>')
+									.addClass('table table-bordered')
+									.append(
+										$('<thead>')
+										.append(
+											$('<tr>')
+											.append($('<th>').text('Average'))
+											.append($('<th>').text('Standard deviation'))
+											.append($('<th>').text('Minimum'))
+											.append($('<th>').text('Maximum'))
+										)
+									)
+									.append(
+										$('<tbody>')
+										.append(
+											$('<tr>')
+											.append($('<td>').attr('id','stat-average'))
+											.append($('<td>').attr('id','stat-deviation'))
+											.append($('<td>').attr('id','stat-min'))
+											.append($('<td>').attr('id','stat-max'))
+										)
+									)
+								)
+							)
+						)
+						//-- Comments
+						.append(
+							$('<fieldset>')
+							.append($('<legend>').text('Comments'))
+							.append(
+								$('<div>')
+								.attr('id','comments')
+								.addClass('fieldset-content')
+								.append(
+									$('<h5>').text('No comments')
+								)
+							)
+						);
+						//-- Prepare and fill chart data
+						let chartData = reportData.contributions[gradee];
+						let chartKeys = Object.keys(chartData);
+						let fIndex = 1, sIndex = 1;
+						let chartLabels = chartKeys.map(function(email){
+							if(/[@]gsw[.]edu$/.test(email)) {
+								//-- Faculty
+								return 'F' + (fIndex++);
+							}
+							//-- Student
+							return 'S' + (sIndex+1);
+						});
+						let chartSeries = chartKeys.map(function(email){
+							return chartData[email].score;
+						});
+						$('.ct-chart').empty();
+						new Chartist.Bar(
+							'.ct-chart',
+							{
+								labels: chartLabels,
+								series: [chartSeries]
+							},
+							{
+								reverseData: true,
+								horizontalBars: true,
+								seriesBarDistance: 20,
+								axisX: {
+									labelOffset: {
+										x: -10,
+										y: 0
+									},
+								}
+							},
+							[
+								[
+									'screen and (min-width: 450px)', {
+										reverseData: false,
+										horizontalBars: false,
+										axisY: {
+											type: Chartist.FixedScaleAxis,
+											labelInterpolationFnc: Chartist.noop,
+											ticks: [0,10,20,30,40,50,60,70,80,90,100]
+										},
+										axisX: {
+											labelOffset: {
+												x: 0,
+												y: 0
+											},
+										}
+									}
+								],
+							]
+						);
+						//-- Calculate and display statistics
+						let stats = getStats(chartSeries);
+						$('#stat-average').text(stats.average);
+						$('#stat-deviation').text(stats.deviation);
+						$('#stat-min').text(stats.min);
+						$('#stat-max').text(stats.max);
+						//-- Comments
+						let comments = chartKeys.map(function(email){
+							return {
+								text: chartData[email].comment,
+								commenter: chartLabels[chartKeys.indexOf(email)]
+							};
+						})
+						.filter(function(entry){
+							return entry.text;
+						});
+						let commentsContainer = $('#comments').empty();
+						if(comments.length) {
+							comments.forEach(function(comment){
+								commentsContainer
+								.append(
+									$('<blockquote>')
+									.append($('<p>').text(comment.text))
+									.append($('<footer>').html('From student <i>' + comment.commenter + '</i>'))
+								);
+							});
+						}
+						else {
+							commentsContainer.parent('fieldset').remove();
+						}
 					}
 					else {
 						//-- Faculty view (table)
@@ -133,23 +292,6 @@ $(document).ready(function(){
 							$('.th-grader select').append($('<option>').attr('value',email).text(data.names[email]));
 						}
 						//-- Table body
-						let getStats = function(array) {
-							let average = array.reduce(function(acc,value){
-								return acc + value;
-							}, 0) / array.length;
-							let deviation = Math.sqrt(array.map(function(entry){
-								return Math.pow(entry - average, 2);
-							})
-							.reduce(function(acc,value){
-								return acc + value;
-							}, 0) / array.length);
-							return {
-								average: average.toFixed(2),
-								deviation: deviation.toFixed(2),
-								max: Math.max.apply(null,array).toFixed(2),
-								min: Math.min.apply(null,array).toFixed(2)
-							};
-						};
 						sortEmailArray(reportData.gradees).forEach(function(gradee) {
 							let scores = Object.keys(reportData.contributions[gradee]).map(function(grader){
 								return reportData.contributions[gradee][grader].score;
@@ -177,7 +319,6 @@ $(document).ready(function(){
 							.append($('<td>').addClass('td-grader').text('--'));
 							tbody.append(trGradee);
 							if(comments.length) {
-								console.log(comments);
 								let trComments = $('<tr>').addClass('tr-comment').append($('<td>').attr('colspan','6').addClass('td-comment'));
 								for(let comment of comments) {
 									trComments.find('.td-comment').append(
@@ -193,8 +334,7 @@ $(document).ready(function(){
 							}
 						});
 					}
-				})
-				.trigger('change');
+				});
 			})
 			.trigger('change');
 		})
