@@ -19,7 +19,6 @@ $(document).ready(function(){
 			console.error('No data to render');
 			return;
 		}
-		console.log(data);
 		//-- Set term select
 		let termData = data;
 		let termKeys = Object.keys(data);
@@ -76,12 +75,123 @@ $(document).ready(function(){
 				projectSelect.change(function(){
 					//-- Update the chart or table
 					let option = $(this).find('option:selected');
-					let data = projectData[option.val()];
-					if(data.gradees.length === 1) {
+					let reportData = projectData[option.val()];
+					let container = $('#report-details').empty();
+					console.log(reportData);
+					if(reportData.gradees.length === 1) {
 						//-- Student's view (chart)
 					}
 					else {
 						//-- Faculty view (table)
+						container
+						.append(
+							$('<div>')
+							.addClass('table-responsive')
+							.append(
+								$('<table>').addClass('table table-hover').attr('id','faculty-view').append($('<thead>')).append($('<tbody>'))
+							)
+						);
+						let thead = $('#faculty-view thead');
+						let tbody = $('#faculty-view tbody');
+						//-- Table header
+						thead
+						.append($('<th>').addClass('th-name').text('Name'))
+						.append($('<th>').addClass('th-stat').text('Average'))
+						.append($('<th>').addClass('th-stat').text('Deviation'))
+						.append($('<th>').addClass('th-stat').text('Min'))
+						.append($('<th>').addClass('th-stat').text('Max'))
+						.append(
+							$('<th>')
+							.addClass('th-grader')
+							.append(
+								$('<form>')
+								.addClass('form-inline')
+								.append(
+									$('<div>').addClass('form-group form-group-sm')
+									.append($('<label>').text('Grader: '))
+									.append($('<select>').addClass('form-control input-sm').append($('<option>').attr('value','--').text('--')).change(function(){
+										//-- Grader changed
+										let grader = $(this).find('option:selected').val();
+										let tbody = $(this).parents('table').find('tbody');
+										tbody.find('tr:not(.tr-comment)').each(function(){
+											let gradee = $(this).attr('data-email');
+											let temp = reportData.contributions[gradee][grader];
+											$(this).find('.td-grader').text(temp ? temp.score.toFixed(2) : '--');
+										});
+									}))
+								)
+							)
+						);
+						let sortEmailArray = function(array) {
+							return array.sort(function(a,b){
+								let A = data.names[a].split(/\s/)[1].toLowerCase();
+								let B = data.names[b].split(/\s/)[1].toLowerCase();
+								return  (A < B) ? -1 : 1;
+							});
+						};
+						for(let email of sortEmailArray(reportData.graders)) {
+							$('.th-grader select').append($('<option>').attr('value',email).text(data.names[email]));
+						}
+						//-- Table body
+						let getStats = function(array) {
+							let average = array.reduce(function(acc,value){
+								return acc + value;
+							}, 0) / array.length;
+							let deviation = Math.sqrt(array.map(function(entry){
+								return Math.pow(entry - average, 2);
+							})
+							.reduce(function(acc,value){
+								return acc + value;
+							}, 0) / array.length);
+							return {
+								average: average.toFixed(2),
+								deviation: deviation.toFixed(2),
+								max: Math.max.apply(null,array).toFixed(2),
+								min: Math.min.apply(null,array).toFixed(2)
+							};
+						};
+						sortEmailArray(reportData.gradees).forEach(function(gradee) {
+							let scores = Object.keys(reportData.contributions[gradee]).map(function(grader){
+								return reportData.contributions[gradee][grader].score;
+							});
+							let comments = Object.keys(reportData.contributions[gradee]).map(function(grader){
+								return {
+									name: data.names[grader],
+									text: reportData.contributions[gradee][grader].comment
+								};
+							}).filter(function(entry){
+								return entry.text;
+							});
+							let stats = getStats(scores);
+							let trGradee = $('<tr>').attr('data-email', gradee)
+							.append(
+								$('<td>')
+								.addClass('td-gradee')
+								.append($('<span>').text(data.names[gradee]))
+								.append($('<span>').addClass('pull-right').addClass(comments.length ? 'glyphicon glyphicon-list-alt' : ''))
+							)
+							.append($('<td>').text(stats.average))
+							.append($('<td>').text(stats.deviation))
+							.append($('<td>').text(stats.min))
+							.append($('<td>').text(stats.max))
+							.append($('<td>').addClass('td-grader').text('--'));
+							tbody.append(trGradee);
+							if(comments.length) {
+								console.log(comments);
+								let trComments = $('<tr>').addClass('tr-comment').append($('<td>').attr('colspan','6').addClass('td-comment'));
+								for(let comment of comments) {
+									trComments.find('.td-comment').append(
+										$('<blockquote>')
+										.append($('<p>').text(comment.text))
+										.append($('<footer>').html('By <i>' + comment.name + '</i>'))
+									);
+								}
+								trGradee.find('.td-gradee span.glyphicon').click(function(){
+									$(this).parents('tr').next().toggle();
+								});
+								tbody.append(trComments);
+							}
+						});
 					}
 				})
 				.trigger('change');

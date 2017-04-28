@@ -123,3 +123,15 @@ fieldset {
 .class-report tbody tr td:first-child {
 	white-space: nowrap;
 }
+/*.td-name {
+	width: 30%;
+}*/
+.th-stat {
+	width: 10%;
+}
+.th-grader select {
+	margin-left: 10px;
+}
+.tr-comment {
+	display: none;
+}

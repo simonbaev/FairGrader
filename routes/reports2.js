@@ -148,7 +148,8 @@ module.exports = function(io) {
 					}
 					async.parallel(emailsForResolution.map(function(email){
 						return emailToName.bind(email);
-					}), function(err, results){
+					}),
+					function(err, results){
 						for(let emailNamePair of results) {
 							if(!data.names[emailToName.email]) {
 								data.names[emailNamePair.email] = emailNamePair.name;

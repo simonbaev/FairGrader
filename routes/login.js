@@ -23,6 +23,9 @@ const authenticateUser = function(email,password,fn) {
 };
 
 router.get('/', function (req, res, next) {
+	if(req.session.uid) {
+		return res.redirect('/');
+	}
 	res.render('login',{
 		session: req.session,
 	});

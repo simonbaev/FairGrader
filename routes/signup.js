@@ -10,6 +10,9 @@ const mailer = require('../lib/mailer');
 const path = require('path');
 
 router.get('/', function (req, res, next) {
+	if(req.session.uid) {
+		return res.redirect('/');
+	}
 	res.render('signup',{
 		session: req.session,
 	});
