@@ -168,7 +168,7 @@ $(document).ready(function(){
 								return 'F' + (fIndex++);
 							}
 							//-- Student
-							return 'S' + (sIndex+1);
+							return 'S' + (sIndex++);
 						});
 						let chartSeries = chartKeys.map(function(email){
 							return chartData[email].score;
