@@ -95,9 +95,11 @@ $(document).ready(function(){
 					let reportData = projectData[option.val()];
 					let container = $('.report-details .fieldset-content').empty();
 					//-- Different views for faculty (all gradees) and student (only his/her reports)
-					if(reportData.gradees.length === 1) {
+					if(true) {
+					// if(reportData.gradees.length === 1) {
 						//-- Student's view (chart)
 						let gradee = reportData.gradees[0];
+						console.log(gradee);
 						container
 						//-- Header (project topic)
 						.append(
