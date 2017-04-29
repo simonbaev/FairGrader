@@ -1,6 +1,6 @@
 /* jshint esnext: true */
 let socket = io('/reports').on('connect',function(){
-	console.log('Data socket successfully connected');
+	// console.log('Data socket successfully connected');
 });
 
 let getStats = function(array) {
@@ -22,19 +22,23 @@ let getStats = function(array) {
 };
 
 $(document).ready(function(){
+	console.clear();
 	socket.emit('getData', function(data){
 		if(!data) {
-			console.error('No data to render');
+			// console.error('No data to render');
 			return;
 		}
+		// console.log('All data', data);
 		//-- Display report data
 		$('#read').click(function(){
 			$('.button-container').fadeOut(function(){
-				$('.report-details').fadeIn(function(){
-					$('#select-project').trigger('change');
-				});
+				$('.report-details').fadeIn();
 			});
 		});
+		//-- Selectors
+		let termSelect = $('#select-term');
+		let courseSelect = $('#select-course');
+		let projectSelect = $('#select-project');
 		//-- Set term select
 		let termData = data;
 		let termKeys = Object.keys(data);
@@ -42,7 +46,7 @@ $(document).ready(function(){
 			$('.report-details .fieldset-content').empty().append($('<h4>').addClass('text-warning').text('No report data found'));
 			return false;
 		}
-		let termSelect = $('#select-term').empty();
+		termSelect.empty();
 		for(let term of termKeys) {
 			termSelect
 			.append(
@@ -56,10 +60,10 @@ $(document).ready(function(){
 		termSelect.find('option:eq(0)').attr('selected','');
 		termSelect.change(function(){
 			//-- Set course within the selected term
-			let option = $(this).find('option:selected');
-			let courseData = termData[option.val()].courses;
+			let courseData = termData[termSelect.find('option:selected').val()].courses;
 			let courseKeys = Object.keys(courseData);
-			let courseSelect = $('#select-course').empty();
+			courseSelect.empty();
+			// console.log('Course data', courseData);
 			for(let course of courseKeys) {
 				courseSelect
 				.append(
@@ -73,10 +77,10 @@ $(document).ready(function(){
 			courseSelect.find('option:eq(0)').attr('selected','');
 			courseSelect.change(function(){
 				//-- Set project within the selected course
-				let option = $(this).find('option:selected');
-				let projectData = courseData[option.val()].projects;
+				let projectData = termData[termSelect.find('option:selected').val()].courses[courseSelect.find('option:selected').val()].projects;
 				let projectKeys = Object.keys(projectData);
-				let projectSelect = $('#select-project').empty();
+				projectSelect.empty();
+				// console.log('Project data', projectData);
 				for(let project of projectKeys) {
 					projectSelect
 					.append(
@@ -90,9 +94,9 @@ $(document).ready(function(){
 				projectSelect.find('option:eq(0)').attr('selected','');
 				projectSelect.change(function(){
 					//-- Update the chart or table
-					let option = $(this).find('option:selected');
-					let reportData = projectData[option.val()];
+					let reportData = termData[termSelect.find('option:selected').val()].courses[courseSelect.find('option:selected').val()].projects[projectSelect.find('option:selected').val()];
 					let container = $('.report-details .fieldset-content').empty();
+					// console.log('Report data',reportData);
 					//-- Different views for faculty (all gradees) and student (only his/her reports)
 					if(reportData.gradees.length === 1) {
 						//-- Student's view (chart)
@@ -333,7 +337,8 @@ $(document).ready(function(){
 							}
 						});
 					}
-				});
+				})
+				.trigger('change');
 			})
 			.trigger('change');
 		})
