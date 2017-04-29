@@ -2,7 +2,7 @@ doctype html
 html(lang='en')
 	head
 		meta(charset='UTF-8')
-		meta(name='viewport', content='width=device-width, initial-scale=0.75, minimum-scale=0.75, maximum-scale=1.0')
+		meta(name='viewport', content='width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=2.0')
 		meta(http-equiv='X-UA-Compatible', content='ie=edge')
 		meta(name='project-id', content=id)
 		meta(name='myself', content=session.email)
@@ -38,9 +38,10 @@ html(lang='en')
 						.panel.bg-info
 							h4 Grading rubrics
 							ul.rubrics.list-unstyled
-						table.table.table-bordered#scores
-							thead
-							tbody
+						.table-responsive
+							table.table.table-bordered#scores
+								thead
+								tbody
 						button.btn.btn-primary.pull-right(type='submit') Submit
 
 		script(src='//code.jquery.com/jquery-3.1.1.min.js')

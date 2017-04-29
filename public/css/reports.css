@@ -68,7 +68,12 @@ fieldset {
 }
 
 .fieldset-content {
-	margin-left: 50px;
+	margin-left: 10px;
+}
+@media (min-width: 450px) {
+	.fieldset-content {
+		margin-left: 50px;
+	}
 }
 
 .report-details {
@@ -127,9 +132,6 @@ fieldset {
 .class-report tbody tr td:first-child {
 	white-space: nowrap;
 }
-/*.td-name {
-	width: 30%;
-}*/
 .th-stat {
 	width: 10%;
 }

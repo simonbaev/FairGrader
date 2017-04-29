@@ -79,6 +79,11 @@ fieldset {
 #scores thead .th-total {
 	width: 70px;
 }
+#scores tbody .total-local,
+#scores tbody .total-global {
+	vertical-align: middle;
+	text-align: center;
+}
 #scores .slider {
 	width: 90% !important;
 	margin: 0 5%;
@@ -114,6 +119,14 @@ fieldset {
 #here {
 	cursor: pointer;
 	text-decoration: none;
+}
+.phone-view input {
+	text-align: center;
+	padding: 0px !important;
+
+	min-width: 40px;
+	/*border-left: none;
+	border-right: none;*/
 }
 
 

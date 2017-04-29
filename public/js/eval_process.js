@@ -169,24 +169,61 @@ $(document).ready(function(){
 						$(this).find('input').trigger('click');
 					})
 				);
-				//-- Add sliders
+				//-- Add sliders & fancy number inputs
+				let getGlyphButton = function(isLeft) {
+					isLeft = isLeft || false;
+					return $('<span>').addClass('input-group-btn')
+					.append(
+						$('<button>').addClass('btn btn-default').attr('type','button')
+						.click(function(){
+							let input = $(this).parents('.phone-view').find('input');
+							let value = parseInt(input.val()) + (isLeft ? -1 : +1);
+							value = value > 100 ? 100 : (value < 0 ? 0 : value);
+							input.val(value).trigger('change');
+						})
+						.append(
+							$('<span>').addClass('glyphicon').addClass(isLeft ? 'glyphicon-chevron-left' : 'glyphicon-chevron-right')
+						)
+					);
+				};
 				for(let criterium of data.project.criteria) {
 					tr.append(
 						$('<td>')
 						.addClass('slider-container')
 						.append(
-							$('<input>')
-							.attr({
-								'type': 'text',
-								'name': 'slider',
-								'data-weight': criterium.weight,
-								'data-slider-min': '0',
-								'data-slider-max': '100',
-								'data-slider-step': '1',
-								'data-slider-value': '0',
-								'data-slider-tooltip': 'hide',
-								'data-slider-enabled': defaultActive ? "true" : "false",
-							})
+							$('<div>').addClass('hidden-xs hidden-sm desktop-view')
+							.append(
+								$('<input>')
+								.attr({
+									'type': 'text',
+									'name': 'slider',
+									'data-weight': criterium.weight,
+									'data-slider-min': '0',
+									'data-slider-max': '100',
+									'data-slider-step': '1',
+									'data-slider-value': '0',
+									'data-slider-tooltip': 'hide',
+									'data-slider-enabled': defaultActive ? "true" : "false",
+								})
+							)
+						)
+						.append(
+							$('<div>').addClass('visible-xs-block visible-sm-block phone-view')
+							.append(
+								$('<div>').addClass('input-group input-group-sm')
+								.append(getGlyphButton(true))
+								.append(
+									$('<input>').addClass('form-control')
+									.attr({
+										'type':'number',
+										'maxlength':'2',
+										'min': '0',
+										'max': '100',
+										'value': 0
+									})
+								)
+								.append(getGlyphButton(false))
+							)
 						)
 					);
 				}
@@ -194,6 +231,10 @@ $(document).ready(function(){
 				tr.find('input[name=slider]').slider();
 				//-- Register slider event(s)
 				let slideHandler = function(e){
+					//-- Update numeric input
+					if(e) {
+						$(this).parents('.slider-container').find('input[type=number]').val(this.value);
+					}
 					//-- Calculation
 					let result = 0;
 					let tr = $(this).parents('tr');
@@ -205,11 +246,22 @@ $(document).ready(function(){
 					let value = result.toFixed(2);
 					tr.find('.total-local').text(value).attr('data-value',value);
 					//-- Global
-					if(e.type === 'slideStop') {
+					if(!e || e.type === 'slideStop') {
 						sockets.eval.emit('change', getFormData(tr.find('.total-local').attr('data-email')));
 					}
 				};
+				let inputChangeHandler = function(e) {
+					/*
+					let value = parseInt(this.value);
+					this.value = value > 100 ? 100 : (value < 0 ? 0 : value);
+					*/
+					let slider = $(this).parents('.slider-container').find('input[name=slider]');
+					slider.slider('setValue', parseInt(this.value));
+					slideHandler.call(slider,null);
+				};
+				//-- Event handlers registration
 				tr.find('input[name=slider]').on('slide', slideHandler).on('slideStop', slideHandler);
+				tr.find('input[type=number]').on('change', inputChangeHandler);
 				//-- Add total (local)
 				tr.append($('<td>').addClass('total-local').text('N/A').attr({
 					'data-email': email,
