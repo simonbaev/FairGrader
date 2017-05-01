@@ -121,26 +121,30 @@ $(document).ready(function(){
 								$('<div>')
 								.addClass('fieldset-content')
 								.append(
-									$('<table>')
-									.addClass('table table-bordered')
+									$('<div>')
+									.addClass('table-responsive')
 									.append(
-										$('<thead>')
+										$('<table>')
+										.addClass('table')
 										.append(
-											$('<tr>')
-											.append($('<th>').text('Average'))
-											.append($('<th>').text('Standard deviation'))
-											.append($('<th>').text('Minimum'))
-											.append($('<th>').text('Maximum'))
+											$('<thead>')
+											.append(
+												$('<tr>')
+												.append($('<th>').text('Average'))
+												.append($('<th>').text('Standard deviation'))
+												.append($('<th>').text('Minimum'))
+												.append($('<th>').text('Maximum'))
+											)
 										)
-									)
-									.append(
-										$('<tbody>')
 										.append(
-											$('<tr>')
-											.append($('<td>').attr('id','stat-average'))
-											.append($('<td>').attr('id','stat-deviation'))
-											.append($('<td>').attr('id','stat-min'))
-											.append($('<td>').attr('id','stat-max'))
+											$('<tbody>')
+											.append(
+												$('<tr>')
+												.append($('<td>').attr('id','stat-average'))
+												.append($('<td>').attr('id','stat-deviation'))
+												.append($('<td>').attr('id','stat-min'))
+												.append($('<td>').attr('id','stat-max'))
+											)
 										)
 									)
 								)
@@ -265,24 +269,17 @@ $(document).ready(function(){
 						.append(
 							$('<th>')
 							.addClass('th-grader')
-							.append(
-								$('<form>')
-								.addClass('form-inline')
-								.append(
-									$('<div>').addClass('form-group form-group-sm')
-									.append($('<label>').text('Grader: '))
-									.append($('<select>').addClass('form-control input-sm').append($('<option>').attr('value','--').text('--')).change(function(){
-										//-- Grader changed
-										let grader = $(this).find('option:selected').val();
-										let tbody = $(this).parents('table').find('tbody');
-										tbody.find('tr:not(.tr-comment)').each(function(){
-											let gradee = $(this).attr('data-email');
-											let temp = reportData.contributions[gradee][grader];
-											$(this).find('.td-grader').text(temp ? temp.score.toFixed(2) : '--');
-										});
-									}))
-								)
-							)
+							.append($('<label>').text('Grader: '))
+							.append($('<select>').addClass('input-sm').append($('<option>').attr('value','--').text('--')).change(function(){
+								//-- Grader changed
+								let grader = $(this).find('option:selected').val();
+								let tbody = $(this).parents('table').find('tbody');
+								tbody.find('tr:not(.tr-comment)').each(function(){
+									let gradee = $(this).attr('data-email');
+									let temp = reportData.contributions[gradee][grader];
+									$(this).find('.td-grader').text(temp ? temp.score.toFixed(2) : '--');
+								});
+							}))
 						);
 						let sortEmailArray = function(array) {
 							return array.sort(function(a,b){

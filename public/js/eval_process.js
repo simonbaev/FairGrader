@@ -1,15 +1,7 @@
 /* jshint esnext: true */
-let sockets = {
-	eval: io('/eval'),
-	api: io('/api')
-};
+let socket = io('/eval');
 
-sockets.api
-.on('connect',function(){
-	console.log('API socket successfully connected');
-});
-
-sockets.eval
+socket
 .on('connect',function(){
 	console.log('Data socket successfully connected');
 })
@@ -21,7 +13,7 @@ sockets.eval
 	if(topicItem) {
 		for(let email in topicItem) {
 			let avg = topicItem[email].total / topicItem[email].count;
-			$('#scores tbody td[data-email="' + email + '"]').next().text(avg.toFixed(2));
+			$('#scores tbody td[data-email="' + email + '"]').next().text(avg.toFixed(2) + ' (' + topicItem[email].count + ')');
 		}
 	}
 })
@@ -44,7 +36,7 @@ function getFormData(email) {
 }
 
 $(document).ready(function(){
-	sockets.eval.emit('getProjectDetails', $('meta[name=project-id]').attr('content'), function(err, data){
+	socket.emit('getProjectDetails', $('meta[name=project-id]').attr('content'), function(err, data){
 		if(!data) {
 			return;
 		}
@@ -85,7 +77,8 @@ $(document).ready(function(){
 			//-- Checkbox for "Active" column to be cloned
 			let cbTemplate = $('<input>').attr({'type':'checkbox', 'name': 'active'});
 			//-- Append new row into <tbody> with just resolved student name
-			let addRow = function(email, studentName) {
+			let addRow = function(email) {
+				let studentName = data.names[email];
 				let tr = $('<tr>');
 				//-- Student name and comment field
 				tr.append($('<td>').text(studentName).click(function(){
@@ -191,7 +184,7 @@ $(document).ready(function(){
 						$('<td>')
 						.addClass('slider-container')
 						.append(
-							$('<div>').addClass('hidden-xs hidden-sm desktop-view')
+							$('<div>').addClass('hidden-xs desktop-view')
 							.append(
 								$('<input>')
 								.attr({
@@ -208,7 +201,7 @@ $(document).ready(function(){
 							)
 						)
 						.append(
-							$('<div>').addClass('visible-xs-block visible-sm-block phone-view')
+							$('<div>').addClass('visible-xs-block phone-view')
 							.append(
 								$('<div>').addClass('input-group input-group-sm')
 								.append(getGlyphButton(true))
@@ -247,14 +240,10 @@ $(document).ready(function(){
 					tr.find('.total-local').text(value).attr('data-value',value);
 					//-- Global
 					if(!e || e.type === 'slideStop') {
-						sockets.eval.emit('change', getFormData(tr.find('.total-local').attr('data-email')));
+						socket.emit('change', getFormData(tr.find('.total-local').attr('data-email')));
 					}
 				};
 				let inputChangeHandler = function(e) {
-					/*
-					let value = parseInt(this.value);
-					this.value = value > 100 ? 100 : (value < 0 ? 0 : value);
-					*/
 					let slider = $(this).parents('.slider-container').find('input[name=slider]');
 					slider.slider('setValue', parseInt(this.value));
 					slideHandler.call(slider,null);
@@ -272,24 +261,10 @@ $(document).ready(function(){
 				tr.append($('<td>').addClass('total-global').text('N/A'));
 				tbody.append(tr);
 			};
-			//-- Resolve student email into name
-			topic.students.forEach(function(email){
-				sockets.api.emit('getStudentByEmail', email, function(err, student){
-					if(err || !student || !student.firstName || !student.lastName) {
-						sockets.api.emit('getUserByEmail', email, function(data){
-							if(data.status !== 0) {
-								addRow(email, email);
-							}
-							else {
-								addRow(email, data.name);
-							}
-						});
-					}
-					else {
-						addRow(email, student.firstName + ' ' + student.lastName);
-					}
-				});
-			});
+			//-- Add rows into table
+			for(let email of topic.students) {
+				addRow(email);
+			}
 		})
 		.trigger('change');
 		//-- Add Instructions toggler (click on "Instructions" legend to toggle)

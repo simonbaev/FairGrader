@@ -5,6 +5,7 @@ const router = express.Router();
 const User = require('../lib/models/user');
 const Project = require('../lib/models/project');
 const Report = require('../lib/models/report');
+const emailToName = require('../lib/commons').emailToName;
 const async = require('async');
 
 function termCodeToString(termCode) {
@@ -253,8 +254,22 @@ module.exports = function(io) {
 				if(err || !projectItem) {
 					return cb(new Error('Cannot retrieve scpecified project for evaluation'));
 				}
-				socket.join(projectItem._id);
-				cb(null, projectItem);
+				//-- Resolve students emails into names
+				async.parallel(projectItem.students.map(function(student){
+					return emailToName.bind(student.email);
+				}), function(err, results){
+					if(err) {
+						return cb(err);
+					}
+					socket.join(projectItem._id);
+					projectItem.names = {};
+					for(let emailNamePair of results) {
+						if(!projectItem.names[emailToName.email]) {
+							projectItem.names[emailNamePair.email] = emailNamePair.name;
+						}
+					}
+					cb(null, projectItem);
+				});
 			});
 		})
 		.on('disconnect', function(){

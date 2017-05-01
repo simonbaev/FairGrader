@@ -67,8 +67,12 @@ fieldset {
 	margin-top: 30px;
 }
 
+fieldset .table {
+	min-width: 600px;
+}
+
 .fieldset-content {
-	margin-left: 10px;
+	margin-left: 20px;
 }
 @media (min-width: 450px) {
 	.fieldset-content {
@@ -112,28 +116,11 @@ fieldset {
    top: 0;
    left: 0
 }
-
-.stat-tooltip tr td:first-child {
-	min-width: 75px;
-	border-right: 1px solid;
+thead th {
+	padding: 8px;
 }
-.stat-tooltip td {
-	padding: 5px;
-}
-.stat-tooltip tr {
-	border-bottom: 1px solid;
-}
-.stat-tooltip tr:last-child {
-	border-bottom: none;
-}
-.diagonal {
-	background-color: lightgray;
-}
-.class-report tbody tr td:first-child {
+.th-grader {
 	white-space: nowrap;
-}
-.th-stat {
-	width: 10%;
 }
 .th-grader select {
 	margin-left: 10px;
