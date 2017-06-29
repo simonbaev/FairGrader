@@ -3,7 +3,6 @@
 const express = require('express');
 const basicAuth = require('basic-auth');
 const cleaner = require('../lib/data/cleaner');
-const reportData = require('../lib/data/report');
 const projectData = require('../lib/data/project');
 const userData = require('../lib/data/user');
 const router = express.Router();
@@ -38,18 +37,7 @@ router.get('/', auth, function(req, res, next) {
 		async.series([
 			cleaner.setup,
 			projectData.setup,
-			function(next) {
-				async.parallel([
-					reportData.setup,
-					userData.setup
-				],
-				function(err, result) {
-					if(err) {
-						return next(err);
-					}
-					next(null, result.join('; '));
-				});
-			}
+			userData.setup
 		],
 		function(err, results) {
 			if(err) {
