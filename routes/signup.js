@@ -66,13 +66,12 @@ router.post('/', function (req, res, next) {
 						message: 'Cannot generate security token'
 					});
 				}
-				var port = req.app.settings.port;
-				var host = req.protocol + '://' + req.hostname  + ':' + port;
+				// var host = req.protocol + '://' + req.hostname  + ':' + port;
 				new EmailTemplate(path.join(__dirname,'..','templates','accountConfirmation')).render(
 					{
 						token: token.uuid,
 						name: user.name || 'User',
-						host: host,
+						host: req.hostname,
 					},
 					function(err,result){
 						if(err) {
