@@ -256,7 +256,7 @@ module.exports = function(io) {
 				}
 				//-- Resolve students emails into names
 				async.parallel(projectItem.students.map(function(student){
-					return emailToName.bind({data: student.email});
+					return emailToName.bind(student.email);
 				}), function(err, results){
 					if(err) {
 						return cb(err);
