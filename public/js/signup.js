@@ -7,7 +7,7 @@ $('.form-panel form').submit(function(){
 		form.serialize(),
 		function(json){
 			if(json.status !== 0) {
-				showMessage($('.message-panel span'),'text-danger', json.message);
+				showMessage($('.message-panel span'),'text-danger', json.message, 5000);
 			}
 			else {
 				bootbox.alert(json.message, function(){

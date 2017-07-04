@@ -28,7 +28,7 @@ $(document).ready(function(){
 			// console.error('No data to render');
 			return;
 		}
-		// console.log('All data', data);
+		console.log('All data', data);
 		//-- Display report data
 		$('#read').click(function(){
 			$('.button-container').fadeOut(function(){
@@ -42,7 +42,8 @@ $(document).ready(function(){
 		//-- Set term select
 		let termData = data;
 		let termKeys = Object.keys(data);
-		if(!termKeys.length) {
+		if(termKeys.length === 1) {
+			//-- No terms defined
 			$('.report-details .fieldset-content').empty().append($('<h4>').addClass('text-warning').text('No report data found'));
 			return false;
 		}
