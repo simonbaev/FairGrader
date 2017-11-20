@@ -22,7 +22,7 @@ router.get(['/:term', '/:term/:course', '/:term/:course/:project'], function (re
 	let term = req.params.term;
 	let course = req.params.course;
 	let project = req.params.project;
-	if((term && /^20[012]\d0[257]$/.test(term)) && (course && /^[A-Z]{3,5}_\d{3,5}$/.test(course)) && project) {
+	if((term && /^20[012]\d0[258]$/.test(term)) && (course && /^[A-Z]{3,5}_\d{3,5}$/.test(course)) && project) {
 		Project.findOne({
 			active: true,
 			term: term,

@@ -35,6 +35,7 @@ socket
 			let courseKeys = Object.keys(courseData);
 			let courseSelect = $('#select-course').empty();
 			for(let course of courseKeys) {
+				console.log(course);
 				courseSelect
 				.append(
 					$('<option>')
@@ -47,8 +48,7 @@ socket
 			courseSelect.find('option:eq(0)').attr('selected','');
 			courseSelect.change(function(){
 				//-- Set project within the selected course
-				let option = $(this).find('option:selected');
-				let projectData = courseData[option.val()].projects;
+				let projectData = termData[termSelect.find('option:selected').val()].courses[courseSelect.find('option:selected').val()].projects;
 				let projectKeys = Object.keys(projectData);
 				let projectSelect = $('#select-project').empty();
 				for(let project of projectKeys) {
